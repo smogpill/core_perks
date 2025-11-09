@@ -4,6 +4,7 @@ abSourceDir = path.join(abRootDir, "Source")
 abBuildDir = path.join(abRootDir, "Build")
 abProjectsDir = path.join(abBuildDir, "Projects")
 abObjDir = path.join(abBuildDir, "Obj")
+abTargetDir = path.join(buildDir, "Bin/$(Configuration)")
 abWorkspacesDir = path.join(abBuildDir, "Workspaces")
 abConfigurations = { "Debug", "Dev", "Profile", "Release" }
 abPCH = "Precompiled"
@@ -68,3 +69,13 @@ function abSetWorkspaceDefaults(name)
 	workspace(name)
 	configurations(abConfigurations)
 	location "Workspaces"
+
+function abSDL3()
+	externalproject "SDL"
+	   	location(abExternDir.."/SDL3/VisualC/SDL")
+	   	uuid "81CE8DAF-EBB2-4761-8E45-B71ABCCA8C68"
+	   	kind "SharedLib"
+	   	language "C++"
+	   	architecture "x64"
+	   	objdir(abObjDir)
+		targetdir(abTargetDir)
