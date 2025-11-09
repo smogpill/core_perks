@@ -1,1 +1,1 @@
-# Arbitrary Bricks for games
+# Game Stones
