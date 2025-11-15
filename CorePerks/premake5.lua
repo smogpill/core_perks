@@ -1,0 +1,1 @@
+SetCppProjectDefaults("CorePerks")
