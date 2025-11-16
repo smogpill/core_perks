@@ -1,43 +1,58 @@
-function cp_Init()
-	cp_rootDir = path.getabsolute("..")
-	cp_externDir = path.join(cp_rootDir, "Extern")
-	cp_sourceDir = path.join(cp_rootDir, "Source")
-	cp_buildDir = path.join(cp_rootDir, "Build")
-	cp_projectsDir = path.join(cp_buildDir, "Projects")
-	cp_objDir = path.join(cp_buildDir, "Obj")
-	cp_targetDir = path.join(cp_buildDir, "Bin/$(Configuration)")
-	cp_workspacesDir = path.join(cp_buildDir, "Workspaces")
-	cp_configurations = { "Debug", "Dev", "Profile", "Release" }
-	cp_pchName = "Precompiled"
+cp = {}
+
+local printPrefix = "[CorePerks] "
+local projectConfigurations = { "Debug", "Dev", "Profile", "Release" }
+local precompiledFilename = "Precompiled"
+
+function cp.Print(msg)
+	print("[CorePerks] "..msg)
 end
 
-function cp_SetProjectDefaults(name)
+-- Load extern modules
+local externModuleFiles = os.matchfiles("Extern/*.lua")
+for _, file in ipairs(externModuleFiles) do
+    local moduleName = path.getbasename(file)
+    cp[moduleName] = dofile(file)
+end
+
+function cp.Configure(params)
+	cp.rootPath = params.rootPath or path.getabsolute("..")
+	cp.externPath = path.join(cp.rootPath, "Extern")
+	cp.sourcePath = path.join(cp.rootPath, "Source")
+	cp.buildPath = path.join(cp.rootPath, "Build")
+	cp.projectsPath = path.join(cp.buildPath, "Projects")
+	cp.objPath = path.join(cp.buildPath, "Obj")
+	cp.targetPath = path.join(cp.buildPath, "Bin/$(Configuration)")
+	cp.workspacesPath = path.join(cp.buildPath, "Workspaces")
+end
+
+function cp.Project(name)
 	project(name)
-	location(cp_projectsDir)
+	location(cp.projectsPath)
 	architecture "x64"
 	kind "StaticLib"
-	objdir(cp_objDir)
+	objdir(cp.objPath)
 	targetdir("$(SolutionDir)$(Platform)/$(Configuration)")
 	libdirs { "$(OutDir)" }
 	includedirs("..")
-	includedirs(cp_externDir)
+	includedirs(cp.externPath)
 
 	debugdir "$(OutDir)"
-	configurations(cp_configurations)
+	configurations(projectConfigurations)
 
 	filter{"configurations:Debug"}
-		defines {"AB_DEBUG", "AB_DEBUG_OR_DEV"}
-	filter{"configurations:Development"}
-		defines {"AB_DEV", "AB_DEBUG_OR_DEV"}
+		defines {"CP_DEBUG", "CP_DEBUG_OR_DEV"}
+	filter{"configurations:Dev"}
+		defines {"CP_DEV", "CP_DEBUG_OR_DEV"}
 	filter{"configurations:Profile"}
-		defines {"AB_PROFILE"}
+		defines {"CP_PROFILE"}
 	filter{"configurations:Release"}
-		defines {"AB_RELEASE"}
+		defines {"CP_RELEASE"}
 	filter {}
 end
 
-function cp_SetCppProjectDefaults(name)
-	cp_SetProjectDefaults(name)
+function cp.CppProject(name)
+	cp.Project(name)
 	rtti "Off"
 	language "C++"
 	exceptionhandling "Off"
@@ -48,9 +63,11 @@ function cp_SetCppProjectDefaults(name)
 	flags { "MultiProcessorCompile" }
 	files { "**.cpp", "**.h", "**.hpp", "**.inl", "**.natvis", "**.lua" }
 
-	if os.isfile(cp_pchName..".h") then
-		pchheader(cp_pchName..".h")
-		pchsource(cp_pchName..".cpp")
+	if os.isfile(precompiledFilename..".h") then
+		pchheader(precompiledFilename..".h")
+		filter "action:vs*"
+			pchsource(precompiledFilename..".cpp")
+		filter {}
 	end
 
 	filter { "action:vs*" }
@@ -67,13 +84,13 @@ function cp_SetCppProjectDefaults(name)
 	filter {}
 end
 
-function cp_SetShaderProjectDefaults(name, targetEnv)
-	SetProjectDefaults("Shaders")
+function cp.ShaderProject(name, targetEnv)
+	cp.Project("Shaders")
 	kind "Utility"
 	files { "**.vert", "**.frag", "**.comp", "**.tesc", "**.tese", "**.geom", "**.glsl", "**.h",
 		"**.rgen", "**.rint", "**.rahit", "**.rchit", "**.rmiss", "**.rcall" }
-	shaderFilter = 'files:**.vert or **.frag or **.comp or **.tesc or **.tese or **.geom or **.rgen or **.rint or **.rahit or **.rchit or **.rmiss or **.rcall'
-	shaderOutPath = "$(OutDir)/"..name.."/%{file.name}.spv"
+	local shaderFilter = 'files:**.vert or **.frag or **.comp or **.tesc or **.tese or **.geom or **.rgen or **.rint or **.rahit or **.rchit or **.rmiss or **.rcall'
+	local shaderOutPath = "$(OutDir)/"..name.."/%{file.name}.spv"
 
 	filter {shaderFilter}
 		buildmessage 'Compiling %{file.relpath}'
@@ -86,19 +103,20 @@ function cp_SetShaderProjectDefaults(name, targetEnv)
 		--buildcommands { '$(VULKAN_SDK)/bin/glslc.exe -O --target-spv='..targetEnv..' -o "'.. shaderOutPath ..'" %{file.relpath}' }
 end
 
-function cp_SetWorkspaceDefaults(name)
+function cp.Workspace(name)
 	workspace(name)
-	configurations(cp_configurations)
+	configurations(projectConfigurations)
 	location "Workspaces"
+	includedirs(path.join(cp.externPath, "CorePerks"))
 end
 
-function cp_SDL3_ExternalProject()
-	externalproject "SDL"
-   	location(cp_externDir.."/SDL3/VisualC/SDL")
-   	uuid "81CE8DAF-EBB2-4761-8E45-B71ABCCA8C68"
-   	kind "SharedLib"
-   	language "C++"
-   	architecture "x64"
-   	objdir(cp_objDir)
-	targetdir(cp_targetDir)
+function cp.AddDependency(projectName)
+	filter "kind:WindowedApp"
+		links { projectName }
+	filter ""
+		dependson { projectName }
+end
+
+function cp.AddProject()
+	include(path.join(cp.externPath, "CorePerks/CorePerks"))
 end

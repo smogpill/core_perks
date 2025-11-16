@@ -1,1 +1,1 @@
-SetCppProjectDefaults("CorePerks")
+cp.CppProject("CorePerks")

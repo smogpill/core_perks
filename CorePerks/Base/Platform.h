@@ -2,4 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "CorePerks/Base/Base.h"
+
+#ifdef _MSC_VER
+#define CP_MSVC
+#endif

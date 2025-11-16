@@ -2,4 +2,5 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "CorePerks/Base/Base.h"
+#include "CorePerks/Threading/Job/Job.h"
+#include "CorePerks/Threading/Job/JobSystem.h"
