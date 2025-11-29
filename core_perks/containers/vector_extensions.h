@@ -6,7 +6,7 @@
 namespace cp
 {
 	template <class T, class Iterator>
-	void EraseUnordered(std::vector<T>& v, const Iterator& it)
+	void erase_unordered(std::vector<T>& v, const Iterator& it)
 	{
 		if (it + 1 != v.end())
 			*it = std::move(v.back());
@@ -14,15 +14,15 @@ namespace cp
 	}
 
 	template <class T>
-	void EraseUnorderedFirst(std::vector<T>& v, const T& element)
+	void erase_unordered_first(std::vector<T>& v, const T& element)
 	{
 		auto it = std::find(v.begin(), v.end(), element);
 		if (it != v.end())
-			EraseUnordered(v, it);
+			erase_unordered(v, it);
 	}
 
 	template <class T>
-	bool Contains(std::vector<T>& v, const T& element)
+	bool contains(std::vector<T>& v, const T& element)
 	{
 		return std::find(v.begin(), v.end(), element) != v.end();
 	}
