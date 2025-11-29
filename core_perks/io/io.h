@@ -4,3 +4,4 @@
 #pragma once
 #include "core_perks/io/file_utils.h"
 #include "core_perks/io/streams.h"
+#include "core_perks/io/resources/resources.h"

@@ -12,7 +12,6 @@
 #endif
 #include "core_perks/io/io.h"
 #include "core_perks/patterns/patterns.h"
-#include "core_perks/resources/resources.h"
 #ifdef CP_SDL
 #include "core_perks/sdl/sdl.h"
 #endif

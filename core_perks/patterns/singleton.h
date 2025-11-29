@@ -21,6 +21,7 @@ namespace cp
 
 		static auto get() -> T& { CP_ASSERT(s_instance); return *s_instance; }
 		static auto get_as_ptr() -> T* { return s_instance; }
+		static bool exists() { return s_instance != nullptr; }
 
 	private:
 		static inline T* s_instance = nullptr;
