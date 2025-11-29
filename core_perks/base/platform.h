@@ -1,0 +1,8 @@
+// CorePerks (https://github.com/smogpill/CorePerks)
+// SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
+// SPDX-License-Identifier: MIT
+#pragma once
+
+#ifdef _MSC_VER
+#define CP_MSVC
+#endif
