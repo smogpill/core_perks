@@ -2,9 +2,4 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-
-namespace cp
-{
-	bool ReadBinaryFile(const std::string& path, std::vector<char>& buffer);
-}
-
+#include "core_perks/math/hash.h"

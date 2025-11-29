@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "CorePerks/Threading/Job/Job.h"
-#include "CorePerks/Patterns/Singleton.h"
+#include "core_perks/threading/job/job.h"
+#include "core_perks/patterns/singleton.h"
 
 namespace cp
 {
@@ -112,10 +112,10 @@ namespace cp
             bool await_ready() const { return false; }
             void await_suspend(std::coroutine_handle<> h)
             {
-                JobSystem::s_instance->EnqueueBlocking([this, h]()
+                JobSystem::Get().EnqueueBlocking([this, h]()
                     {
                         _result = callable();
-                        JobSystem::s_instance->Enqueue([h]() { h.resume(); });
+                        JobSystem::Get().Enqueue([h]() { h.resume(); });
                     });
             }
             ResultType await_resume() { return std::move(_result); }
@@ -129,7 +129,7 @@ namespace cp
     struct ScheduleOnJobSystem
     {
         bool await_ready() const { return false; }
-        void await_suspend(std::coroutine_handle<> h) { JobSystem::s_instance->Enqueue([h]() { h.resume(); }); }
+        void await_suspend(std::coroutine_handle<> h) { JobSystem::Get().Enqueue([h]() { h.resume(); }); }
         void await_resume() const {}
     };
 }

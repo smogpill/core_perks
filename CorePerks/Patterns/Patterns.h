@@ -2,6 +2,6 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "CorePerks/Patterns/Reference.h"
-#include "CorePerks/Patterns/Singleton.h"
-#include "CorePerks/Patterns/StateMachine.h"
+#include "core_perks/patterns/reference.h"
+#include "core_perks/patterns/singleton.h"
+#include "core_perks/patterns/state_machine.h"

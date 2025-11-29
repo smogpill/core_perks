@@ -1,8 +1,8 @@
 // CorePerks (https://github.com/smogpill/CorePerks)
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
-#include "Precompiled.h"
-#include "CorePerks/Patterns/StateMachine.h"
+#include "precompiled.h"
+#include "core_perks/patterns/state_machine.h"
 
 namespace cp
 {

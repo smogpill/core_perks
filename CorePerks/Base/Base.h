@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "CorePerks/Generated/Config.h"
-#include "CorePerks/Base/ExternalIncludes.h"
-#include "CorePerks/Base/Platform.h"
+#include "core_perks/generated/config.h"
+#include "core_perks/base/external_includes.h"
+#include "core_perks/base/platform.h"
 
 // Base types
 using int8 = int8_t;
@@ -20,15 +20,17 @@ using uint64 = uint64_t;
 namespace cp
 {
 	/// To avoid some gcc warnings with the comma operator
-	inline void ReturnVoid(int) {}
+	inline void return_void(int) {}
 }
 
 #ifdef CP_MSVC
-#define CP_BREAKPOINT() cp::ReturnVoid(IsDebuggerPresent() && (__debugbreak(), 1))
+#define CP_BREAKPOINT() cp::return_void(IsDebuggerPresent() && (__debugbreak(), 1))
+#define CP_FORCE_INLINE __forceinline
 #else
 #define CP_BREAKPOINT() std::breakpoint_if_debugging()
+#define CP_FORCE_INLINE [[gnu::always_inline]]
 #endif
 
 #define CP_SAFE_SCOPE(_x_) do { _x_ } while (!!false)
 
-#include "CorePerks/Base/Diagnostics.h"
+#include "core_perks/base/diagnostics.h"

@@ -2,5 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "core_perks/threading/job/job.h"
-#include "core_perks/threading/job/job_system.h"
+
+namespace cp
+{
+	bool ReadBinaryFile(const std::string& path, std::vector<char>& buffer);
+}

@@ -12,6 +12,7 @@
 #include <fstream>
 #include <vector>
 #include <deque>
+#include <queue>
 #include <unordered_map>
 #include <algorithm>
 #include <string>
@@ -25,6 +26,18 @@
 #include <mutex>
 #include <condition_variable>
 #include <optional>
+#include <nmmintrin.h>
+
+#ifdef CP_XXHASH
+#ifdef CP_PRIVATE_INCLUDES
+#include <xxHash/xxhash.h>
+#endif
+#endif
+
+#ifdef CP_XXHASHCT
+#include <xxhashct/xxh32.hpp>
+#include <xxhashct/xxh64.hpp>
+#endif
 
 #ifdef CP_GLM
 #define GLM_FORCE_XYZW_ONLY

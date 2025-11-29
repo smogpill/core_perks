@@ -19,8 +19,10 @@ namespace cp
 			s_instance = nullptr;
 		}
 
-		static auto GetInstanceAsRef() -> T& { CP_ASSERT(s_instance); return *s_instance; }
+		static auto Get() -> T& { CP_ASSERT(s_instance); return *s_instance; }
+		static auto GetAsPtr() -> T* { return s_instance; }
 
+	private:
 		static inline T* s_instance = nullptr;
 	};
 }
