@@ -157,14 +157,14 @@ namespace cp
 	struct CP_FORCE_SYMBOL_INCLUSION_ATTRIBUTE _TypeInitializer_##_type_\
 	{ \
 		using Class = _type_; \
-		using Base = TypeBase<_type_>::Type; \
-		using TypeClass = TypeClassHelper<_type_>::Type; \
+		using Base = cp::TypeBase<_type_>::Type; \
+		using TypeClass = cp::TypeClassHelper<_type_>::Type; \
 		_TypeInitializer_##_type_() \
 		{ \
-			Type* type = cp::detail::TypeStatic<_type_>::get_type_static(); \
+			cp::Type* type = cp::detail::TypeStatic<_type_>::get_type_static(); \
 			type->_set_init_func(&init); \
 		} \
-		static void init(Type& type) \
+		static void init(cp::Type& type) \
 		{ \
 			type._init_generics<_type_>(); \
 			user_init(static_cast<TypeClass*>(&type)); \
@@ -195,14 +195,25 @@ namespace cp
 			return &type; \
 		} \
 	} 
-
-#define CP_CLASS(_class_) \
+#define _CP_CLASS_SHARED(_class_) \
 	private: \
 		using Self = _class_; \
 		friend struct _TypeInitializer_##_class_; \
 	public: \
 		using TypeClass = TypeClassHelper<_class_>::Type; \
 		static TypeClass* get_type_static(); \
+	private:
+
+#define CP_CLASS_NO_POLYMORPHISM(_class_) \
+	_CP_CLASS_SHARED(_class_) \
+	public:\
+		TypeClass* get_type() const { return get_type_static(); } \
+	private:
+
+#define CP_CLASS(_class_) \
+	_CP_CLASS_SHARED(_class_) \
+	public:\
+		virtual TypeClass* get_type() const { return get_type_static(); } \
 	private:
 
 #define CP_DEFINE_CLASS(_class_) \
