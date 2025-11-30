@@ -10,8 +10,5 @@ namespace cp
 	{
 	public:
 		TypeManager();
-
-	private:
-		friend class Type;
 	};
 }

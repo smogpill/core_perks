@@ -27,24 +27,4 @@ namespace cp
 		if (_init_type_func)
 			_init_type_func(*type);
 	}
-
-	namespace detail
-	{
-		std::vector<detail::TypeAutoRegistrator*> registrators;
-
-		void TypeAutoRegistrator::add_registrator(TypeAutoRegistrator& registrator)
-		{
-			registrators.push_back(&registrator);
-		}
-
-		TypeAutoRegistrator* TypeAutoRegistrator::get_registrator(int idx)
-		{
-			return registrators[idx];
-		}
-
-		int TypeAutoRegistrator::get_registrator_count()
-		{
-			return (int)registrators.size();
-		}
-	}
 }

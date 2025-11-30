@@ -10,17 +10,17 @@ namespace cp
 	namespace detail
 	{
 		template <class T, bool>
-		struct MoveIfAvailable
+		struct TypeMove
 		{
 		};
 
 		template <class T>
-		struct MoveIfAvailable<T, true>
+		struct TypeMove<T, true>
 		{
 			static void move(void* from, void* to) { *static_cast<T*>(to) = std::move(*static_cast<T*>(from)); }
 		};
 		template <class T>
-		struct MoveIfAvailable<T, false>
+		struct TypeMove<T, false>
 		{
 			static void move(void* from, void* to) { CP_ASSERT(false); }
 		};
@@ -68,26 +68,6 @@ namespace cp
 			typename T::Base; // Checks if T has a nested 'Base' type
 			requires std::is_base_of_v<typename T::Base, T>;  // Checks if T::Base is actually its base
 		};
-
-		class CP_FORCE_SYMBOL_INCLUSION_ATTRIBUTE TypeAutoRegistrator
-		{
-		public:
-			static TypeAutoRegistrator* get_registrator(int idx);
-			static int get_registrator_count();
-			static void add_registrator(TypeAutoRegistrator&);
-		};
-
-		template <class T>
-		class CP_FORCE_SYMBOL_INCLUSION_ATTRIBUTE ClassTypeAutoRegistrator : public TypeAutoRegistrator
-		{
-		public:
-			using InitFunc = void (*)(Type&);
-			ClassTypeAutoRegistrator(InitFunc init_func)
-			{
-				Type* type = TypeStatic<T>::get_type_static();
-				type->_init_type_func = init_func;
-			}
-		};
 	}
 
 	template <typename T, typename = void>
@@ -122,14 +102,16 @@ namespace cp
 
 		template <class T>
 		void init_generics();
-		auto create() -> void* { return _create_func(); }
-		auto copy_create(const void* from) -> void* { return _copy_create_func(from); }
+		auto create() -> void* { return _create(); }
+		auto copy_create(const void* from) -> void* { return _copy_create(from); }
+		void construct(void* ptr) { _construct(ptr); }
+		void copy_construct(void* ptr, const void* from) { _copy_construct(ptr, from); }
+		void destruct(void* ptr) { _destruct(ptr); }
 		template <class T>
 		auto get() -> Type* { return detail::TypeStatic<T>::get_type(); }
-		void set_init_type_func(auto func) { _init_type_func = func; }
+		void set_init_func(auto func) { _init = func; }
 
 	private:
-		friend detail::ClassTypeAutoRegistrator;
 		friend class TypeManager;
 
 		void init(Type* type = nullptr);
@@ -140,12 +122,13 @@ namespace cp
 		uint16 _alignment8 = 0;
 		bool _initialized : 1 = false;
 		bool _trivially_copyable : 1 = false;
-		std::function<void* ()> _create_func;
-		std::function<void* (const void*)> _copy_create_func;
-		std::function<void(void*)> _construct_func;
-		std::function<void(void*, const void*)> _copy_construct_func;
-		std::function<void(void*)> _destruct_func;
-		std::function<void(Type&)> _init_type_func;
+		std::function<void* ()> _create;
+		std::function<void* (const void*)> _copy_create;
+		std::function<void(void*)> _construct;
+		std::function<void(void*, const void*)> _copy_construct;
+		std::function<void(void*, void*)> _move;
+		std::function<void(void*)> _destruct;
+		std::function<void(Type&)> _init;
 		std::string _name;
 
 		static std::vector<Type*> _types;
@@ -160,33 +143,34 @@ namespace cp
 		_alignment8 = alignof(T);
 		_trivially_copyable = std::is_trivially_copyable<T>::value;
 		using type_factory = detail::TypeFactory<T, !std::is_abstract_v<T>&& std::is_default_constructible_v<T>>;
-		_create_func = &type_factory::create;
-		_copy_create_func = &type_factory::copy_create;
-		_construct_func = &type_factory::construct;
-		_copy_construct_func = &type_factory::copy_construct;
-		_destruct_func = &type_factory::destruct;
+		_create = &type_factory::create;
+		_copy_create = &type_factory::copy_create;
+		_construct = &type_factory::construct;
+		_copy_construct = &type_factory::copy_construct;
+		_move = &detail::TypeMove<T, std::is_copy_assignable<T>::value>::move;
+		_destruct = &type_factory::destruct;
 	}
 }
 
-#define _CP_TYPE_INITIALIZATION(_class_) \
-	struct CP_FORCE_SYMBOL_INCLUSION_ATTRIBUTE _ClassInitializer_##_class_\
+#define _CP_TYPE_INITIALIZATION(_type_) \
+	struct CP_FORCE_SYMBOL_INCLUSION_ATTRIBUTE _TypeInitializer_##_type_\
 	{ \
-		using Class = _class_; \
-		using Base = TypeBase<Class>::Type; \
-		using TypeClass = TypeClassHelper<Class>::Type; \
-		_ClassInitializer_##_class_() \
+		using Class = _type_; \
+		using Base = TypeBase<_type_>::Type; \
+		using TypeClass = TypeClassHelper<_type_>::Type; \
+		_TypeInitializer_##_type_() \
 		{ \
-			Type* type = cp::detail::TypeStatic<_class_>::get_type_static(); \
-			type->set_init_type_func(&init); \
+			Type* type = cp::detail::TypeStatic<_type_>::get_type_static(); \
+			type->set_init_func(&init); \
 		} \
 		static void init(Type& type) \
 		{ \
-			type.init_generics<_class_>(); \
+			type.init_generics<_type_>(); \
 			user_init(static_cast<TypeClass*>(&type)); \
 		} \
 		static void user_init(TypeClass*); \
-	} _class_initializer_##_class_; \
-	void _ClassInitializer_##_class_::user_init(TypeClass* type)
+	} _type_initializer_##_type_; \
+	void _TypeInitializer_##_type_::user_init(TypeClass* type)
 
 #define CP_BASE(_class_) \
 	private:\
@@ -214,7 +198,7 @@ namespace cp
 #define CP_CLASS(_class_) \
 	private: \
 		using Self = _class_; \
-		friend struct _ClassInitializer_##_class_; \
+		friend struct _TypeInitializer_##_class_; \
 	public: \
 		using TypeClass = TypeClassHelper<_class_>::Type; \
 		static TypeClass* get_type_static(); \
