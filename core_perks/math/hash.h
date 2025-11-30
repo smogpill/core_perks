@@ -11,6 +11,7 @@ namespace cp::hash
 		CP_FORCE_INLINE uint32 hash32(uint32 x, uint32 seed = 0) { return _mm_crc32_u32(seed, x); }
 		CP_FORCE_INLINE uint64 hash64(uint64 x, uint64 seed = 0) { return _mm_crc32_u64(seed, x); }
 		uint32 hash32(const void* data, uint64 length, uint32 seed = 0);
+		uint32 hash32(const std::string& str, uint32 seed = 0) { return hash32(str.data(), str.length(), seed); }
 	}
 	
 	namespace xxhash

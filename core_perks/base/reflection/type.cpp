@@ -4,11 +4,13 @@
 #include "precompiled.h"
 #include "core_perks/base/reflection/type.h"
 #include "core_perks/base/reflection/type_manager.h"
+#include "core_perks/math/hash.h"
 
 namespace cp
 {
 	Type::Type(const char* name)
 		: _name(name)
+		, _name_hash(hash::fast::hash32(_name))
 	{
 		_types.push_back(this);
 	}
@@ -24,7 +26,7 @@ namespace cp
 		}
 		if (_base)
 			_base->init(type);
-		if (_init_type_func)
-			_init_type_func(*type);
+		if (_init)
+			_init(*type);
 	}
 }

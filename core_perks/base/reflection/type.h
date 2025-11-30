@@ -100,8 +100,6 @@ namespace cp
 		Type(const char* name);
 		virtual ~Type() = default;
 
-		template <class T>
-		void init_generics();
 		auto create() -> void* { return _create(); }
 		auto copy_create(const void* from) -> void* { return _copy_create(from); }
 		void construct(void* ptr) { _construct(ptr); }
@@ -109,7 +107,10 @@ namespace cp
 		void destruct(void* ptr) { _destruct(ptr); }
 		template <class T>
 		auto get() -> Type* { return detail::TypeStatic<T>::get_type(); }
-		void set_init_func(auto func) { _init = func; }
+
+		template <class T>
+		void _init_generics();
+		void _set_init_func(auto func) { _init = func; }
 
 	private:
 		friend class TypeManager;
@@ -135,7 +136,7 @@ namespace cp
 	};
 
 	template <class T>
-	void Type::init_generics()
+	void Type::_init_generics()
 	{
 		using BaseType = TypeBase<T>::Type;
 		_base = detail::TypeStatic<BaseType>::get_type_static();
@@ -161,11 +162,11 @@ namespace cp
 		_TypeInitializer_##_type_() \
 		{ \
 			Type* type = cp::detail::TypeStatic<_type_>::get_type_static(); \
-			type->set_init_func(&init); \
+			type->_set_init_func(&init); \
 		} \
 		static void init(Type& type) \
 		{ \
-			type.init_generics<_type_>(); \
+			type._init_generics<_type_>(); \
 			user_init(static_cast<TypeClass*>(&type)); \
 		} \
 		static void user_init(TypeClass*); \
