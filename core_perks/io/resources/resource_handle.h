@@ -11,10 +11,9 @@ namespace cp
 	{
 	public:
 		UntypedResourceHandle() = default;
-		UntypedResourceHandle(const std::string& id);
+		UntypedResourceHandle(const std::string& id, const Type& type);
 		//UntypedResourceHandle(const UntypedResourceHandle& other) : _entry(other._entry) {}
 
-		void set_id(const std::string& id);
 		void release() { _entry.release(); }
 		void load_async(std::function<void(bool)> on_done = [](bool) {});
 		void unload_async();
@@ -27,7 +26,8 @@ namespace cp
 	protected:
 		UntypedResourceHandle(ResourceEntry* entry) : _entry(entry) {}
 		
-		auto get() const -> Resource* { if (_entry) return _entry->get(); return nullptr; }
+		void set_id(const std::string& id, const Type& type);
+		auto get() const -> Resource* { return _entry ? _entry->get() : nullptr; }
 		void set_resource(Resource* resource);
 
 		cp::RefPtr<ResourceEntry> _entry;

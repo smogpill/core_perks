@@ -138,7 +138,9 @@ function cp.add_project(modules)
 ]]
 
 	for _, module in ipairs(modules) do
-		module.add_dependency()
+		if module.add_dependency then
+			module.add_dependency()
+		end
 		config_content = config_content .. "#define CP_".. module.define_suffix .. "\n"
 	end
 

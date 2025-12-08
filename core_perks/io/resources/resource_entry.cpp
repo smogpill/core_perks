@@ -13,7 +13,7 @@
 
 namespace cp
 {
-    ResourceEntry::ResourceEntry(const std::string& id, uint64 id_hash, const cp::Type& type)
+    ResourceEntry::ResourceEntry(const std::string& id, uint64 id_hash, const Type& type)
         : _id(id)
         , _id_hash(id_hash)
         , _type(&type)

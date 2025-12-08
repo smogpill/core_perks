@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/io/resources/base/resource_base.h"
+#include "core_perks/io/resources/resource_handle.h"
 #include "core_perks/patterns/reference.h"
 
 namespace cp
@@ -22,7 +23,7 @@ namespace cp
 		using Base = RefCounted;
 	public:
 		using Callback = std::function<void(bool)>;
-		ResourceEntry(const std::string& id, uint64 id_hash, const cp::Type& type);
+		ResourceEntry(const std::string& id, uint64 id_hash, const Type& type);
 		virtual ~ResourceEntry();
 
 		auto get_id() const -> const std::string& { return _id; }

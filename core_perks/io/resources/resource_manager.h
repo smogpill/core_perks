@@ -26,7 +26,7 @@ namespace cp
 		friend class ResourceEntry;
 		friend class UntypedResourceHandle;
 
-		auto get_or_create_entry(const std::string& id) -> ResourceEntry*;
+		auto get_or_create_entry(const std::string& id, const Type& type) -> ResourceEntry*;
 		void destroy_entry(ResourceEntry& entry);
 		void add_request(const UntypedResourceHandle& request);
 

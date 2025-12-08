@@ -7,14 +7,14 @@
 
 namespace cp
 {
-	UntypedResourceHandle::UntypedResourceHandle(const std::string& id)
-		: _entry(ResourceManager::get().get_or_create_entry(id))
+	UntypedResourceHandle::UntypedResourceHandle(const std::string& id, const Type& type)
+		: _entry(ResourceManager::get().get_or_create_entry(id, type))
 	{
 	}
 
-	void UntypedResourceHandle::set_id(const std::string& id)
+	void UntypedResourceHandle::set_id(const std::string& id, const Type& type)
 	{
-		_entry = ResourceManager::get().get_or_create_entry(id);
+		_entry = ResourceManager::get().get_or_create_entry(id, type);
 	}
 
 	void UntypedResourceHandle::set_resource(Resource* resource)

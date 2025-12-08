@@ -21,5 +21,12 @@ namespace cp
 		RELEASING
 	};
 
-	using hash_resource_id = hash::strong::hash64;
+	namespace hash
+	{
+		namespace resource_id
+		{
+			using strong::hash64;
+			using strong::hash64_compile_time;
+		}
+	}
 }

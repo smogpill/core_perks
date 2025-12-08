@@ -26,7 +26,7 @@ namespace cp
 	void ResourceManager::destroy_entry(ResourceEntry& entry)
 	{
 		_mutex.lock();
-		auto it = _map.find(entry.get_id());
+		auto it = _map.find(entry.get_id_hash());
 		_map.erase(it);
 		_mutex.unlock();
 	}
@@ -37,14 +37,14 @@ namespace cp
 		_requests.push(request);
 	}
 
-	ResourceEntry* ResourceManager::get_or_create_entry(const std::string& id)
+	ResourceEntry* ResourceManager::get_or_create_entry(const std::string& id, const Type& type)
 	{
-		const uint64 id_hash = hash_resource_id(id);
+		const uint64 id_hash = hash::resource_id::hash64(id);
 		std::scoped_lock lock(_mutex);
 		auto it = _map.find(id_hash);
 		if (it == _map.end())
 		{
-			ResourceEntry* entry = new ResourceEntry(id, id_hash);
+			ResourceEntry* entry = new ResourceEntry(id, id_hash, type);
 			_map[id] = entry;
 			return entry;
 		}
