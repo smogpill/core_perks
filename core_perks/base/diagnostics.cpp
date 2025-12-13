@@ -6,7 +6,7 @@
 
 namespace cp
 {
-    void Message(MessageType type, const char* file, uint line, const std::string& message)
+    void message(MessageType type, const char* file, uint line, const std::string& message)
     {
         const char* typeStr = "<unknown>";
         switch (type)
@@ -14,6 +14,7 @@ namespace cp
         case MessageType::INFO: typeStr = "Info"; break;
         case MessageType::ERROR: typeStr = "Error"; break;
         case MessageType::ASSERT: typeStr = "Assert"; break;
+        case MessageType::FATAL: typeStr = "Fatal"; break;
         default: break;
         }
         const std::string text = std::format("{}({}): {}: {}\n", file, line, typeStr, message.c_str());
@@ -23,6 +24,23 @@ namespace cp
             std::cerr << text;
 #ifdef CP_WINDOWS
         ::OutputDebugStringA(text.c_str());
+#endif
+
+        if (type == MessageType::ASSERT || type == MessageType::FATAL)
+        {
+#ifdef CP_WINDOWS
+            MessageBoxA(nullptr, text.c_str(), "Fatal Error", MB_OK | MB_ICONERROR);
+#endif
+            crash();
+        }
+    }
+
+    void crash()
+    {
+#ifdef CP_WINDOWS
+        __ud2();
+#else
+        __builtin_trap();
 #endif
     }
 }

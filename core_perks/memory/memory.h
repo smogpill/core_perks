@@ -35,19 +35,7 @@ namespace cp
 	};
 	*/
 
-	void* aligned_alloc(size_t alignment, size_t size, AllocTag tag);
+	void* alloc(size_t size, AllocTag tag = AllocTag());
+	void* aligned_alloc(size_t alignment, size_t size, AllocTag tag = AllocTag());
 	void free(void* ptr);
-
-	class StackAllocator
-	{
-	public:
-
-	};
-
-	class ArenaAllocator
-	{
-	public:
-
-	};
-
 }

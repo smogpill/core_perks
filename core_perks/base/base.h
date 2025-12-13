@@ -9,6 +9,14 @@
 #define CP_PROFILE_OR_RELEASE
 #endif
 
+/*
+#ifdef CP_DEBUG
+#define CP_DEBUG_EXPRESSION(_expr_) _expr_
+#else
+#define CP_DEBUG_EXPRESSION(_expr_)
+#endif
+*/
+
 #include "core_perks/generated/config.h"
 #include "core_perks/base/public_externals.h"
 #include "core_perks/base/platform.h"
