@@ -8,7 +8,7 @@ namespace cp
 {
 	TypeManager::TypeManager()
 	{
-		for (Type* type : Type::_types)
+		for (Type* type : Type::get_types())
 			type->init();
 	}
 }

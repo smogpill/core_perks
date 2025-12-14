@@ -5,16 +5,20 @@
 #include "core_perks/base/reflection/type.h"
 #include "core_perks/base/reflection/type_manager.h"
 #include "core_perks/math/numerical/hash.h"
+#include "core_perks/containers/vector_extensions.h"
 
 namespace cp
 {
-	std::vector<Type*> Type::_types;
-
 	Type::Type(const char* name)
 		: _name(name)
 		, _name_hash(hash::fast::hash32(_name))
 	{
-		_types.push_back(this);
+		get_types().push_back(this);
+	}
+
+	Type::~Type()
+	{
+		erase_unordered_first(get_types(), this);
 	}
 
 	void Type::init(Type* type)
@@ -47,9 +51,15 @@ namespace cp
 	std::vector<Type*> Type::get_derived() const
 	{
 		std::vector<Type*> derived_types;
-		for (Type* type : _types)
+		for (Type* type : get_types())
 			if (type != this && type->is_a(*this))
 				derived_types.push_back(type);
 		return derived_types;
+	}
+
+	std::vector<Type*>& Type::get_types()
+	{
+		static std::vector<Type*> types;
+		return types;
 	}
 }

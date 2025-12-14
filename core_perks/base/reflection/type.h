@@ -98,7 +98,7 @@ namespace cp
 	{
 	public:
 		Type(const char* name);
-		virtual ~Type() = default;
+		virtual ~Type();
 
 		template <class T = void>
 		auto create() const -> T* { return static_cast<T*>(_create()); }
@@ -135,7 +135,7 @@ namespace cp
 		std::function<void(Type&)> _init;
 		std::string _name;
 
-		static std::vector<Type*> _types;
+		static std::vector<Type*>& get_types();
 	};
 
 	template <class T>
