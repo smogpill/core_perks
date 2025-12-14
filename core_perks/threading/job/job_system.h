@@ -32,42 +32,42 @@ namespace cp
         /// For the resource manager's dependency waiting
         void resume_coroutine(std::coroutine_handle<> h) { enqeue([h]() { h.resume(); }); }
         void stop();
-        bool is_running() const { return _running; }
+        bool is_running() const { return running_; }
 
     private:
         void WorkerThread();
 
-        std::vector<std::jthread> _threads;
-        std::deque<Job> _job_queue;
-        std::mutex _queue_mutex;
-        std::condition_variable _condition;
-        std::atomic<bool> _running = true;
+        std::vector<std::jthread> threads_;
+        std::deque<Job> job_queue_;
+        std::mutex queue_mutex_;
+        std::condition_variable condition_;
+        std::atomic<bool> running_ = true;
 
         // Separate queue and thread for blocking operations (like file I/O)
-        std::deque<Job> _blocking_queue;
-        std::mutex _blocking_mutex;
-        std::condition_variable _blocking_condition;
-        std::jthread _blocking_thread;
+        std::deque<Job> blocking_queue_;
+        std::mutex blocking_mutex_;
+        std::condition_variable blocking_condition_;
+        std::jthread blocking_thread_;
     };
 
     template<typename Callable>
     void JobSystem::enqeue(Callable&& callable)
     {
         {
-            std::unique_lock lock(_queue_mutex);
-            _job_queue.emplace_back(std::forward<Callable>(callable));
+            std::unique_lock lock(queue_mutex_);
+            job_queue_.emplace_back(std::forward<Callable>(callable));
         }
-        _condition.notify_one();
+        condition_.notify_one();
     }
 
     template<typename Callable>
     void JobSystem::enqueue_blocking(Callable&& callable)
     {
         {
-            std::unique_lock lock(_blocking_mutex);
-            _blocking_queue.emplace_back(std::forward<Callable>(callable));
+            std::unique_lock lock(blocking_mutex_);
+            blocking_queue_.emplace_back(std::forward<Callable>(callable));
         }
-        _blocking_condition.notify_one();
+        blocking_condition_.notify_one();
     }
 
     template<typename CoroutineJob>
@@ -76,7 +76,7 @@ namespace cp
         using ResultType = decltype(coro_task.get_result());
         struct Awaiter
         {
-            CoroutineJob _task;
+            CoroutineJob task_;
 
             bool await_ready() const { return false; }
             void await_suspend(std::coroutine_handle<> h)
@@ -84,19 +84,19 @@ namespace cp
                 // Wrap the coroutine task and continuation in a job
                 JobSystem::_singleton->enqeue([this, h]() mutable
                     {
-                        _task.start(); // Execute the coroutine until it suspends or completes
-                        if (_task.done())
+                        task_.start(); // Execute the coroutine until it suspends or completes
+                        if (task_.done())
                         {
                             // If done immediately, resume the caller directly
                             h.resume();
                         }
                         else {
                             // Otherwise, store the handle for later resumption
-                            _task.set_continuation(h);
+                            task_.set_continuation(h);
                         }
                     });
             }
-            ResultType await_resume() { return _task.get_result(); }
+            ResultType await_resume() { return task_.get_result(); }
         };
         return Awaiter{ this, std::forward<CoroutineJob>(coro_task) };
     }
@@ -114,13 +114,13 @@ namespace cp
             {
                 JobSystem::get().enqueue_blocking([this, h]()
                     {
-                        _result = callable();
+                        result_ = callable();
                         JobSystem::get().enqeue([h]() { h.resume(); });
                     });
             }
-            ResultType await_resume() { return std::move(_result); }
+            ResultType await_resume() { return std::move(result_); }
 
-            std::optional<ResultType> _result;
+            std::optional<ResultType> result_;
         };
         return BlockingAwaiter{ this, std::forward<Callable>(callable) };
     }

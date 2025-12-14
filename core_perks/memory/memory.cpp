@@ -6,7 +6,7 @@
 
 namespace cp
 {
-	void fill_as_deleted(void* ptr_, size_t size)
+	void mark_memory_as_deleted(void* ptr_, size_t size)
 	{
 		uint8* ptr = static_cast<uint8*>(ptr_);
 		while (size >= 8)

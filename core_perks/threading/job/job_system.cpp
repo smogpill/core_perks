@@ -9,27 +9,27 @@ namespace cp
     JobSystem::JobSystem(uint thread_count)
     {
         // Create worker threads
-        _threads.reserve(thread_count);
+        threads_.reserve(thread_count);
         for (uint i = 0; i < thread_count; ++i)
         {
-            _threads.emplace_back(&JobSystem::WorkerThread, this);
+            threads_.emplace_back(&JobSystem::WorkerThread, this);
         }
 
         // Create blocking I/O thread
-        _blocking_thread = std::jthread([this](std::stop_token st)
+        blocking_thread_ = std::jthread([this](std::stop_token st)
             {
                 while (!st.stop_requested())
                 {
                     Job job;
                     {
-                        std::unique_lock lock(_blocking_mutex);
-                        _blocking_condition.wait(lock, [this, &st]
+                        std::unique_lock lock(blocking_mutex_);
+                        blocking_condition_.wait(lock, [this, &st]
                             {
-                                return !_blocking_queue.empty() || st.stop_requested();
+                                return !blocking_queue_.empty() || st.stop_requested();
                             });
                         if (st.stop_requested()) break;
-                        job = std::move(_blocking_queue.front());
-                        _blocking_queue.pop_front();
+                        job = std::move(blocking_queue_.front());
+                        blocking_queue_.pop_front();
                     }
                     job();
                 }
@@ -43,21 +43,21 @@ namespace cp
 
     void JobSystem::WorkerThread()
     {
-        while (_running)
+        while (running_)
         {
             Job job;
             {
-                std::unique_lock lock(_queue_mutex);
-                _condition.wait(lock, [this]
+                std::unique_lock lock(queue_mutex_);
+                condition_.wait(lock, [this]
                     {
-                        return !_job_queue.empty() || !_running;
+                        return !job_queue_.empty() || !running_;
                     });
 
-                if (!_running && _job_queue.empty())
+                if (!running_ && job_queue_.empty())
                     break;
 
-                job = std::move(_job_queue.front());
-                _job_queue.pop_front();
+                job = std::move(job_queue_.front());
+                job_queue_.pop_front();
             }
             job();
         }
@@ -65,23 +65,23 @@ namespace cp
 
     void JobSystem::stop()
     {
-        if (!_running.exchange(false))
+        if (!running_.exchange(false))
             return;
 
-        _condition.notify_all();
-        _blocking_condition.notify_all();
+        condition_.notify_all();
+        blocking_condition_.notify_all();
 
-        for (auto& thread : _threads)
+        for (auto& thread : threads_)
         {
             if (thread.joinable())
                 thread.join();
         }
 
-        _blocking_thread.request_stop();
-        _blocking_condition.notify_all();
-        if (_blocking_thread.joinable())
+        blocking_thread_.request_stop();
+        blocking_condition_.notify_all();
+        if (blocking_thread_.joinable())
         {
-            _blocking_thread.join();
+            blocking_thread_.join();
         }
     }
 }

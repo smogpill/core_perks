@@ -29,4 +29,15 @@ namespace cp
 		if (_init)
 			_init(*type);
 	}
+
+	bool Type::is_a(const Type& type) const
+	{
+		const Type* it = this;
+		do
+		{
+			if (it == &type)
+				return true;
+			it = it->_base;
+		} while (it);
+	}
 }

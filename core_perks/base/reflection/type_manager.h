@@ -10,5 +10,7 @@ namespace cp
 	{
 	public:
 		TypeManager();
+
+		std::vector<Type*> get_derived_types(const Type& type) const;
 	};
 }

@@ -10,7 +10,7 @@ namespace cp
 	template <typename T>
 	constexpr T align_down(const T val, const T alignment) { /*CP_ASSERT(is_power_of_two(alignment)); */ return val & ~(alignment - 1); }
 	constexpr bool is_aligned(const void* ptr, size_t alignment) { return (std::bit_cast<uintptr>(ptr) & (alignment - 1)) == 0; }
-	void fill_as_deleted(void* ptr, size_t size);
+	void mark_memory_as_deleted(void* ptr, size_t size);
 
 	template <typename T>
 	CP_FORCE_INLINE void swap_memory(T& a, T& b)

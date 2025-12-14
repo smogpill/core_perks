@@ -69,7 +69,7 @@ namespace cp
 		CP_ASSERT((uint8*)ptr + header->size_ == memory_ + offset_);
         offset_ = (size_t)ptr - header->header_alloc_size_;
 #ifdef CP_DEBUG
-		fill_as_deleted(memory_ + offset_, header->header_alloc_size_ + header->size_);
+		mark_memory_as_deleted(memory_ + offset_, header->header_alloc_size_ + header->size_);
 #endif
 	}
 }

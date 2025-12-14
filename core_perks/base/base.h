@@ -32,11 +32,14 @@ using uint16 = uint16_t;
 using uint32 = uint32_t;
 using uint64 = uint64_t;
 using uintptr = uintptr_t;
+//using ndbool = [[nodiscard]] bool;
 
 namespace cp
 {
 	/// To avoid some gcc warnings with the comma operator
-	inline void return_void(int) {}
+	constexpr void return_void(int) {}
+	constexpr bool return_false() { return false; }
+	constexpr bool return_true() { return true; }
 }
 
 #ifdef CP_MSVC
@@ -49,7 +52,7 @@ namespace cp
 #define CP_FORCE_SYMBOL_INCLUSION_ATTRIBUTE __attribute__ ((used))
 #endif
 
-#define CP_SAFE_SCOPE(_x_) do { _x_ } while (!!false)
+#define CP_SAFE_SCOPE(_x_) do { _x_ } while (0)
 
 #include "core_perks/base/diagnostics.h"
 #include "core_perks/base/reflection/reflection.h"

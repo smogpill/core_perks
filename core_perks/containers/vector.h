@@ -140,7 +140,7 @@ namespace cp
 		if (data_)
 		{
 			std::destroy(data_, data_ + size_);
-			CP_ASSERT(_allocator);
+			CP_ASSERT(allocator_);
 			free(data_);
 		}
 	}
@@ -152,7 +152,7 @@ namespace cp
 			return;
 		std::destroy(data_, data_ + size_);
 #ifdef CP_DEBUG
-		fill_as_deleted(data_, uint64(size_) * sizeof(T));
+		mark_memory_as_deleted(data_, uint64(size_) * sizeof(T));
 #endif
 		size_ = 0;
 	}
@@ -219,7 +219,7 @@ namespace cp
 			{
 				std::destroy(data_ + new_size, data_ + size_);
 #ifdef CP_DEBUG
-				fill_as_deleted(data_ + new_size, uint64(size_ - new_size) * sizeof(T));
+				mark_memory_as_deleted(data_ + new_size, uint64(size_ - new_size) * sizeof(T));
 #endif
 			}
 			size_ = new_size;
@@ -241,7 +241,7 @@ namespace cp
 			{
 				std::destroy(data_ + new_size, data_ + size_);
 #ifdef CP_DEBUG
-				fill_as_deleted(data_ + new_size, uint64(size_ - new_size) * sizeof(T));
+				mark_memory_as_deleted(data_ + new_size, uint64(size_ - new_size) * sizeof(T));
 #endif
 			}
 			size_ = new_size;
@@ -311,7 +311,7 @@ namespace cp
 				data_[i] = std::move(data_[i + count]);
 			std::destroy(data_ + new_size, data_ + size_);
 #ifdef CP_DEBUG
-			fill_as_deleted(data_ + new_size, uint64(size_ - new_size) * sizeof(T));
+			mark_memory_as_deleted(data_ + new_size, uint64(size_ - new_size) * sizeof(T));
 #endif
 			size_ = new_size;
 		}
@@ -387,7 +387,7 @@ namespace cp
 		}
 		std::destroy_at(previous);
 #ifdef CP_DEBUG
-		fill_as_deleted(previous, sizeof(T));
+		mark_memory_as_deleted(previous, sizeof(T));
 #endif
 		--size_;
 		return it;
@@ -417,7 +417,7 @@ namespace cp
 		*it = std::move(*back);
 		std::destroy_at(back);
 #ifdef CP_DEBUG
-		fill_as_deleted(back, sizeof(T));
+		mark_memory_as_deleted(back, sizeof(T));
 #endif
 		return it;
 	}

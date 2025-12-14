@@ -59,7 +59,7 @@ namespace cp
 		template <class T>
 		struct TypeStatic<T, std::void_t<decltype(T::get_type_static)>>
 		{
-			static Type* get_type_static() { return T::get_type_static(); }
+			static Type* get_type_static() { return &T::get_type_static(); }
 		};
 
 		template <typename T>
@@ -108,6 +108,7 @@ namespace cp
 		void destruct(void* ptr) const { _destruct(ptr); }
 		template <class T>
 		static auto get() -> Type* { return detail::TypeStatic<T>::get_type_static(); }
+		bool is_a(const Type& type) const;
 
 		template <class T>
 		void _init_generics();
@@ -174,6 +175,15 @@ namespace cp
 	} _type_initializer_##_type_; \
 	void _TypeInitializer_##_type_::user_init(TypeClass* type)
 
+#define _CP_CLASS_SHARED(_class_) \
+	private: \
+		using Self = _class_; \
+		friend struct _TypeInitializer_##_class_; \
+	public: \
+		using TypeClass = TypeClassHelper<_class_>::Type; \
+		static TypeClass& get_type_static(); \
+	private:
+
 #define CP_BASE(_class_) \
 	private:\
 		using Base = _class_; \
@@ -190,38 +200,30 @@ namespace cp
 	template <> \
 	struct cp::detail::TypeStatic<_type_> \
 	{ \
-		static Type* get_type_static() \
+		static Type& get_type_static() \
 		{ \
 			static Type type(#_type_); \
-			return &type; \
+			return type; \
 		} \
 	} 
-#define _CP_CLASS_SHARED(_class_) \
-	private: \
-		using Self = _class_; \
-		friend struct _TypeInitializer_##_class_; \
-	public: \
-		using TypeClass = TypeClassHelper<_class_>::Type; \
-		static TypeClass* get_type_static(); \
-	private:
 
 #define CP_CLASS_NO_POLYMORPHISM(_class_) \
 	_CP_CLASS_SHARED(_class_) \
 	public:\
-		TypeClass* get_type() const { return get_type_static(); } \
+		TypeClass& get_type() const { return get_type_static(); } \
 	private:
 
 #define CP_CLASS(_class_) \
 	_CP_CLASS_SHARED(_class_) \
 	public:\
-		virtual TypeClass* get_type() const { return get_type_static(); } \
+		virtual TypeClass& get_type() const { return get_type_static(); } \
 	private:
 
 #define CP_DEFINE_CLASS(_class_) \
-	auto _class_::get_type_static() -> TypeClass* \
+	auto _class_::get_type_static() -> TypeClass& \
 	{ \
 		static TypeClass type(#_class_); \
-		return &type; \
+		return type; \
 	} \
 	_CP_TYPE_INITIALIZATION(_class_)
 

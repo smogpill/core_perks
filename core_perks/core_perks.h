@@ -23,3 +23,4 @@
 #define TRACY_ENABLE
 #include <tracy/Tracy.hpp>
 #endif
+#include "core_perks/test/test.h"
