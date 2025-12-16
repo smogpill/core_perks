@@ -2,7 +2,7 @@ cp = {}
 
 local output_prefix = "[core_perks] "
 local project_configurations = { "debug", "dev", "profile", "release" }
-local precompiled_filename = "precompiled"
+local pch_filename = "pch"
 
 function cp.print(msg)
 	print(output_prefix..msg)
@@ -71,9 +71,9 @@ function cp.cpp_project(name)
 	flags { "MultiProcessorCompile" }
 	files { "**.cpp", "**.h", "**.hpp", "**.inl", "**.natvis", "**.lua" }
 
-	if os.isfile(path.join(_SCRIPT_DIR, precompiled_filename..".h")) then
-		pchheader(precompiled_filename..".h")
-		pchsource(path.join(_SCRIPT_DIR, precompiled_filename..".cpp"))
+	if os.isfile(path.join(_SCRIPT_DIR, pch_filename..".h")) then
+		pchheader(pch_filename..".h")
+		pchsource(path.join(_SCRIPT_DIR, pch_filename..".cpp"))
 	end
 
 	filter { "action:vs*" }
