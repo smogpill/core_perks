@@ -18,7 +18,7 @@
 */
 
 #include "core_perks/generated/config.h"
-#include "core_perks/base/public_externals.h"
+#include "core_perks/extern/public_externals.h"
 #include "core_perks/base/platform.h"
 
 // Base types

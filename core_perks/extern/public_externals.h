@@ -84,3 +84,10 @@
 #ifdef CP_TINYOBJLOADER
 #include <tinyobjloader/tiny_obj_loader.h>
 #endif
+
+#ifdef CP_TRACY
+#ifndef CP_RELEASE
+#define TRACY_ENABLE
+#endif
+#include <tracy/Tracy.hpp>
+#endif

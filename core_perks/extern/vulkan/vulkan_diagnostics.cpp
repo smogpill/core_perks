@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/vulkan/vulkan_diagnostics.h"
+#include "core_perks/extern/vulkan/vulkan_diagnostics.h"
 
 #ifdef CP_VULKAN
 namespace cp
