@@ -6,15 +6,15 @@
 namespace cp
 {
 	class BinaryOutputStream;
-	class ResourceLoader;
+	class AssetLoader;
 
-	class Resource
+	class Asset
 	{
-		CP_CLASS(Resource);
+		CP_CLASS(Asset);
 	public:
-		virtual ~Resource() = default;
+		virtual ~Asset() = default;
 
-		virtual bool on_load(ResourceLoader& loader) = 0 { return true; }
+		virtual bool on_load(AssetLoader& loader) = 0 { return true; }
 		virtual bool on_dependencies_loaded() { return true; }
 		virtual void on_store(cp::BinaryOutputStream& stream) const {}
 

@@ -2,28 +2,28 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/io/resources/resource_manager.h"
-#include "core_perks/io/resources/resource_loader.h"
+#include "core_perks/io/assets/asset_manager.h"
+#include "core_perks/io/assets/asset_loader.h"
 
 namespace cp
 {
-	ResourceManager::~ResourceManager()
+	AssetManager::~AssetManager()
 	{
 		std::scoped_lock lock(mutex_);
 		CP_ASSERT(map_.empty());
 	}
 
-	void ResourceManager::set_assets_path(const std::string& path)
+	void AssetManager::set_assets_path(const std::string& path)
 	{
 		assets_path_ = path;
 	}
 
-	void ResourceManager::set_cache_path(const std::string& path)
+	void AssetManager::set_cache_path(const std::string& path)
 	{
 		cache_path_ = path;
 	}
 
-	void ResourceManager::destroy_entry(ResourceEntry& entry)
+	void AssetManager::destroy_entry(AssetEntry& entry)
 	{
 		mutex_.lock();
 		auto it = map_.find(entry.get_id_hash());
@@ -31,20 +31,20 @@ namespace cp
 		mutex_.unlock();
 	}
 
-	void ResourceManager::add_request(const UntypedResourceHandle& request)
+	void AssetManager::add_request(const UntypedAssetHandle& request)
 	{
 		std::scoped_lock lock(mutex_);
 		requests_.push(request);
 	}
 
-	ResourceEntry* ResourceManager::get_or_create_entry(const std::string& id, const Type& type)
+	AssetEntry* AssetManager::get_or_create_entry(const std::string& id, const Type& type)
 	{
 		const uint64 id_hash = hash::resource_id::hash64(id);
 		std::scoped_lock lock(mutex_);
 		auto it = map_.find(id_hash);
 		if (it == map_.end())
 		{
-			ResourceEntry* entry = new ResourceEntry(id, id_hash, type);
+			AssetEntry* entry = new AssetEntry(id, id_hash, type);
 			map_[id_hash] = entry;
 			return entry;
 		}

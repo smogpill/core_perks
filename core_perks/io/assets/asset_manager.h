@@ -3,16 +3,16 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/patterns/singleton.h"
-#include "core_perks/io/resources/resource.h"
-#include "core_perks/io/resources/resource_entry.h"
-#include "core_perks/io/resources/resource_handle.h"
+#include "core_perks/io/assets/asset.h"
+#include "core_perks/io/assets/asset_entry.h"
+#include "core_perks/io/assets/asset_handle.h"
 
 namespace cp
 {
-	class ResourceManager : public Singleton<ResourceManager>
+	class AssetManager : public Singleton<AssetManager>
 	{
 	public:
-		~ResourceManager();
+		~AssetManager();
 
 		// Assets path
 		void set_assets_path(const std::string& path);
@@ -23,16 +23,16 @@ namespace cp
 		const std::string& get_cache_path() const { return cache_path_; }
 
 	private:
-		friend class ResourceEntry;
-		friend class UntypedResourceHandle;
+		friend class AssetEntry;
+		friend class UntypedAssetHandle;
 
-		ResourceEntry* get_or_create_entry(const std::string& id, const Type& type);
-		void destroy_entry(ResourceEntry& entry);
-		void add_request(const UntypedResourceHandle& request);
+		AssetEntry* get_or_create_entry(const std::string& id, const Type& type);
+		void destroy_entry(AssetEntry& entry);
+		void add_request(const UntypedAssetHandle& request);
 
 		mutable std::mutex mutex_;
-		std::unordered_map<uint64, ResourceEntry*> map_;
-		std::queue<UntypedResourceHandle> requests_;
+		std::unordered_map<uint64, AssetEntry*> map_;
+		std::queue<UntypedAssetHandle> requests_;
 		std::string assets_path_;
 		std::string cache_path_;
 

@@ -6,15 +6,15 @@
 
 namespace cp
 {
-	class Resource;
-	class ResourceEntry;
+	class Asset;
+	class AssetEntry;
 
-	class UntypedResourceHandle
+	class UntypedAssetHandle
 	{
 	public:
-		UntypedResourceHandle() = default;
-		UntypedResourceHandle(const std::string& id, const Type& type);
-		~UntypedResourceHandle() = default;
+		UntypedAssetHandle() = default;
+		UntypedAssetHandle(const std::string& id, const Type& type);
+		~UntypedAssetHandle() = default;
 		//UntypedResourceHandle(const UntypedResourceHandle& other) : entry_(other.entry_) {}
 
 		void release() { entry_.release(); }
@@ -27,25 +27,25 @@ namespace cp
 		operator bool() const { return entry_ != nullptr; }
 
 	protected:
-		UntypedResourceHandle(ResourceEntry* entry);
+		UntypedAssetHandle(AssetEntry* entry);
 
 		void set_id(const std::string& id, const Type& type);
-		Resource* get() const;
-		void set_resource(Resource* resource);
+		Asset* get() const;
+		void set_resource(Asset* resource);
 
-		cp::RefPtr<ResourceEntry> entry_;
+		cp::RefPtr<AssetEntry> entry_;
 	};
 
 	template <class T>
-	class ResourceHandle : public UntypedResourceHandle
+	class AssetHandle : public UntypedAssetHandle
 	{
-		using Base = UntypedResourceHandle;
+		using Base = UntypedAssetHandle;
 	public:
-		using Base::UntypedResourceHandle;
+		using Base::UntypedAssetHandle;
 		using Base::operator=;
 
-		ResourceHandle() = default;
-		ResourceHandle(const std::string& id) : Base(id, T::get_type_static()) {}
+		AssetHandle() = default;
+		AssetHandle(const std::string& id) : Base(id, T::get_type_static()) {}
 		/*
 		ResourceHandle() = default;
 		ResourceHandle(const std::string& id);
@@ -59,7 +59,7 @@ namespace cp
 		//auto operator=(const ResourceHandle& other) -> ResourceHandle& { entry_ = other.entry_; return *this; }
 
 	private:
-		friend class ResourceManager;
-		friend class ResourceLoader;
+		friend class AssetManager;
+		friend class AssetLoader;
 	};
 }

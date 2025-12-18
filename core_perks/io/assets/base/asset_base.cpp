@@ -1,13 +1,9 @@
 // Core Perks (https://github.com/smogpill/core_perks)
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
-#pragma once
+#include "pch.h"
+#include "core_perks/io/assets/base/asset_base.h"
 
 namespace cp
 {
-	class resource_provider
-	{
-	public:
-
-	};
 }

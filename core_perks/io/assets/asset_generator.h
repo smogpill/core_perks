@@ -5,7 +5,7 @@
 
 namespace cp
 {
-	class ResourceGenerator
+	class AssetGenerator
 	{
 
 	};

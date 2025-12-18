@@ -18,7 +18,7 @@ namespace cp
 
 	Type::~Type()
 	{
-		erase_unordered_first(get_types(), this);
+		swap_and_pop_first(get_types(), this);
 	}
 
 	void Type::init(Type* type)

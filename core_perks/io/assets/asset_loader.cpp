@@ -2,23 +2,23 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/io/resources/resource_loader.h"
-#include "core_perks/io/resources/resource_entry.h"
-#include "core_perks/io/resources/resource_manager.h"
+#include "core_perks/io/assets/asset_loader.h"
+#include "core_perks/io/assets/asset_entry.h"
+#include "core_perks/io/assets/asset_manager.h"
 
 namespace cp
 {
-    ResourceLoader::ResourceLoader(ResourceEntry& entry)
+    AssetLoader::AssetLoader(AssetEntry& entry)
         : _entry(entry)
     {
     }
 
-    auto ResourceLoader::get_asset_path() const -> std::string
+    auto AssetLoader::get_asset_path() const -> std::string
     {
         return _entry.get_asset_path();
     }
 
-    bool ResourceLoader::read_as_binary_file(std::vector<uint8>& content)
+    bool AssetLoader::read_as_binary_file(std::vector<uint8>& content)
     {
         namespace fs = std::filesystem;
         const std::filesystem::path path = get_asset_path();
@@ -42,12 +42,12 @@ namespace cp
         return true;
     }
 
-    bool ResourceLoader::path_exists() const
+    bool AssetLoader::path_exists() const
     {
         return _entry.path_exists();
     }
 
-    auto ResourceLoader::get_id() const -> const std::string&
+    auto AssetLoader::get_id() const -> const std::string&
     {
         return _entry.get_id();
     }

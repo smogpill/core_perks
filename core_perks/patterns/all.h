@@ -6,3 +6,4 @@
 #include "core_perks/patterns/singleton.h"
 #include "core_perks/patterns/state_machine.h"
 #include "core_perks/patterns/scope_exit.h"
+#include "core_perks/patterns/test.h"

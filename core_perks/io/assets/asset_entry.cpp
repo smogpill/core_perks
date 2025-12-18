@@ -2,42 +2,42 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/io/resources/base/resource_base.h"
-#include "core_perks/io/resources/resource_entry.h"
-#include "core_perks/io/resources/resource_manager.h"
-#include "core_perks/io/resources/resource_loader.h"
-#include "core_perks/io/resources/resource.h"
+#include "core_perks/io/assets/base/asset_base.h"
+#include "core_perks/io/assets/asset_entry.h"
+#include "core_perks/io/assets/asset_manager.h"
+#include "core_perks/io/assets/asset_loader.h"
+#include "core_perks/io/assets/asset.h"
 #include "core_perks/io/streams.h"
 #include "core_perks/math/numerical/hash.h"
 #include "core_perks/threading/job/job_system.h"
 
 namespace cp
 {
-    ResourceEntry::ResourceEntry(const std::string& id, uint64 id_hash, const Type& type)
+    AssetEntry::AssetEntry(const std::string& id, uint64 id_hash, const Type& type)
         : id_(id)
         , id_hash_(id_hash)
         , type_(&type)
     {
     }
 
-    ResourceEntry::~ResourceEntry()
+    AssetEntry::~AssetEntry()
     {
         delete resource_;
         delete loading_resource_;
     }
 
-    void ResourceEntry::add_loading_dependency()
+    void AssetEntry::add_loading_dependency()
     {
         ++nb_loading_dependencies_;
     }
 
-    void ResourceEntry::remove_loading_dependency()
+    void AssetEntry::remove_loading_dependency()
     {
         if (--nb_loading_dependencies_ == 0)
         {
             callback_mutex_.lock();
 
-            Resource* loaded_resource = loading_resource_.exchange(nullptr);
+            Asset* loaded_resource = loading_resource_.exchange(nullptr);
 
             // Notify that all dependencies have been loaded
             if (loading_result_)
@@ -46,15 +46,15 @@ namespace cp
             // Swap the resource and update the state
             if (loading_result_)
             {
-                Resource* old_resource = resource_.exchange(loaded_resource);
+                Asset* old_resource = resource_.exchange(loaded_resource);
                 delete old_resource;
-                state_ = ResourceState::READY;
+                state_ = AssetState::READY;
             }
             else
             {
                 delete loaded_resource;
-                if (state_ != ResourceState::READY)
-                    state_ = ResourceState::FAILED;
+                if (state_ != AssetState::READY)
+                    state_ = AssetState::FAILED;
             }
 
             // Call the callbacks
@@ -76,23 +76,23 @@ namespace cp
         }
     }
 
-    void ResourceEntry::on_all_refs_removed()
+    void AssetEntry::on_all_refs_removed()
     {
-        ResourceManager::get().destroy_entry(*this);
+        AssetManager::get().destroy_entry(*this);
         Base::on_all_refs_removed();
     }
 
-    void ResourceEntry::add_load_callback(Callback callback)
+    void AssetEntry::add_load_callback(Callback callback)
     {
         std::scoped_lock lock(callback_mutex_);
         switch (state_)
         {
-        case ResourceState::READY:
+        case AssetState::READY:
         {
             cp::JobSystem::get().enqeue([cb = std::move(callback)]() { cb(true); });
             break;
         }
-        case ResourceState::FAILED:
+        case AssetState::FAILED:
         {
             cp::JobSystem::get().enqeue([cb = std::move(callback)]() { cb(false); });
             break;
@@ -105,17 +105,17 @@ namespace cp
         }
     }
 
-    void ResourceEntry::load_async(Callback on_done)
+    void AssetEntry::load_async(Callback on_done)
     {
-        ResourceState expected = ResourceState::NONE;
-        if (!target_state_.compare_exchange_strong(expected, ResourceState::READY))
+        AssetState expected = AssetState::NONE;
+        if (!target_state_.compare_exchange_strong(expected, AssetState::READY))
         {
 
         }
         add_load_callback(on_done);
         
         /*
-        if (state_.compare_exchange_strong(expected, ResourceState::LOADING))
+        if (state_.compare_exchange_strong(expected, AssetState::LOADING))
         {
             add_ref();
             cp::JobSystem::get().enqeue([this]()
@@ -133,43 +133,43 @@ namespace cp
         */
     }
 
-    void ResourceEntry::unload_async()
+    void AssetEntry::unload_async()
     {
-        ResourceState expected = ResourceState::READY;
-        if (state_.compare_exchange_strong(expected, ResourceState::RELEASING))
+        AssetState expected = AssetState::READY;
+        if (state_.compare_exchange_strong(expected, AssetState::RELEASING))
         {
             add_ref();
             cp::JobSystem::get().enqeue([this]()
                 {
-                    Resource* resource = resource_.exchange(nullptr);
+                    Asset* resource = resource_.exchange(nullptr);
                     delete resource;
                     remove_ref();
                 });
         }
     }
 
-    void ResourceEntry::store_async(Callback on_done)
+    void AssetEntry::store_async(Callback on_done)
     {
         add_ref();
 
         cp::JobSystem::get().enqeue([this, callback = std::move(on_done)]()
             {
-                ResourceState expected = ResourceState::READY;
-                while (!state_.compare_exchange_weak(expected, ResourceState::SERIALIZING))
+                AssetState expected = AssetState::READY;
+                while (!state_.compare_exchange_weak(expected, AssetState::SERIALIZING))
                 {
-                    if (expected != ResourceState::SERIALIZING)
+                    if (expected != AssetState::SERIALIZING)
                     {
                         callback(false);
                         return;
                     }
-                    expected = ResourceState::READY;
+                    expected = AssetState::READY;
                 }
-                const Resource* resource = resource_;
+                const Asset* resource = resource_;
                 cp::BinaryOutputStream stream;
                 resource->on_store(stream);
 
-                expected = ResourceState::SERIALIZING;
-                const bool was_serializing = state_.compare_exchange_strong(expected, ResourceState::READY);
+                expected = AssetState::SERIALIZING;
+                const bool was_serializing = state_.compare_exchange_strong(expected, AssetState::READY);
                 CP_ASSERT(was_serializing);
 
                 namespace fs = std::filesystem;
@@ -209,25 +209,25 @@ namespace cp
             });
     }
 
-    bool ResourceEntry::path_exists() const
+    bool AssetEntry::path_exists() const
     {
         return std::filesystem::exists(get_asset_path());
     }
 
-    auto ResourceEntry::get_name() const -> std::string
+    auto AssetEntry::get_name() const -> std::string
     {
         const size_t pos = id_.find_last_of('/');
         return (pos == std::string::npos) ? id_ : id_.substr(pos + 1);
     }
 
-    void ResourceEntry::set(Resource* resource)
+    void AssetEntry::set(Asset* resource)
     {
-        Resource* old_resource = resource_.exchange(resource);
+        Asset* old_resource = resource_.exchange(resource);
         delete old_resource;
     }
 
-    auto ResourceEntry::get_asset_path() const -> std::string
+    auto AssetEntry::get_asset_path() const -> std::string
     {
-        return (std::filesystem::path(ResourceManager::get().get_assets_path()) / get_id()).string();
+        return (std::filesystem::path(AssetManager::get().get_assets_path()) / get_id()).string();
     }
 }

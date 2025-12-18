@@ -2,14 +2,14 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "core_perks/io/resources/base/resource_base.h"
-#include "core_perks/io/resources/resource_handle.h"
+#include "core_perks/io/assets/base/asset_base.h"
+#include "core_perks/io/assets/asset_handle.h"
 #include "core_perks/patterns/reference.h"
 
 namespace cp
 {
-	class ResourceLoader;
-	class Resource;
+	class AssetLoader;
+	class Asset;
 
 	template <class T>
 	struct LoadResult
@@ -18,13 +18,13 @@ namespace cp
 		bool result_ = false;
 	};
 
-	class ResourceEntry : public RefCounted
+	class AssetEntry : public RefCounted
 	{
 		using Base = RefCounted;
 	public:
 		using Callback = std::function<void(bool)>;
-		ResourceEntry(const std::string& id, uint64 id_hash, const Type& type);
-		virtual ~ResourceEntry();
+		AssetEntry(const std::string& id, uint64 id_hash, const Type& type);
+		virtual ~AssetEntry();
 
 		const std::string& get_id() const { return id_; }
 		std::string get_name() const;
@@ -35,28 +35,28 @@ namespace cp
 		bool path_exists() const;
 		void unload_async();
 		void store_async(Callback callback);
-		Resource* get() const { return resource_; }
-		void set(Resource* resource);
+		Asset* get() const { return resource_; }
+		void set(Asset* asset);
 		std::string get_asset_path() const;
 
 	protected:
-		friend class ResourceLoader;
-		friend class ResourceManager;
+		friend class AssetLoader;
+		friend class AssetManager;
 		void on_all_refs_removed() override;
 		void add_load_callback(Callback callback);
 
 		std::string id_;
 		uint64 id_hash_ = 0;
 		const cp::Type* type_ = nullptr;
-		RefPtr<ResourceEntry> loading_parent_;
+		RefPtr<AssetEntry> loading_parent_;
 		std::atomic<uint32> nb_loading_dependencies_ = 0;
 		std::mutex callback_mutex_;
-		std::atomic<ResourceState> state_ = ResourceState::NONE;
-		std::atomic<ResourceState> target_state_ = ResourceState::NONE;
+		std::atomic<AssetState> state_ = AssetState::NONE;
+		std::atomic<AssetState> target_state_ = AssetState::NONE;
 		std::vector<Callback> load_callbacks_;
-		std::atomic<Resource*> resource_ = nullptr;
-		std::atomic<Resource*> loading_resource_ = nullptr;
-		std::vector<UntypedResourceHandle> dependencies_;
+		std::atomic<Asset*> resource_ = nullptr;
+		std::atomic<Asset*> loading_resource_ = nullptr;
+		std::vector<UntypedAssetHandle> dependencies_;
 
 		bool loading_result_ = false;
 		std::mutex mutex_;

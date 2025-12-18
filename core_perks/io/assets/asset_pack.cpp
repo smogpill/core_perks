@@ -2,12 +2,17 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/io/resources/resource_pack.h"
+#include "core_perks/io/assets/asset_pack.h"
 #include "core_perks/containers/vector_extensions.h"
 
 namespace cp
 {
-	void ResourcePack::add_resource(const UntypedResourceHandle& handle)
+	CP_DEFINE_CLASS(AssetPack)
+	{
+
+	}
+
+	void AssetPack::add_resource(const UntypedAssetHandle& handle)
 	{
 		if (!contains(resources_, handle))
 			resources_.push_back(handle);

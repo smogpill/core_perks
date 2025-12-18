@@ -6,7 +6,7 @@
 
 namespace cp
 {
-	enum class ResourceState
+	enum class AssetState
 	{
 		// Stable states
 		NONE,

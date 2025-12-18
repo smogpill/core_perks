@@ -5,18 +5,17 @@
 
 #include "core_perks/base/base.h"
 #include "core_perks/memory/memory.h"
-#include "core_perks/math/math.h"
-#include "core_perks/containers/containers.h"
+#include "core_perks/math/all.h"
+#include "core_perks/containers/all.h"
 #ifdef CP_GLM
 #include "core_perks/extern/glm/glm.h"
 #endif
-#include "core_perks/io/io.h"
-#include "core_perks/patterns/patterns.h"
+#include "core_perks/io/all.h"
+#include "core_perks/patterns/all.h"
 #ifdef CP_SDL
 #include "core_perks/extern/sdl/sdl.h"
 #endif
-#include "core_perks/threading/threading.h"
+#include "core_perks/threading/all.h"
 #ifdef CP_VULKAN
 #include "core_perks/extern/vulkan/vulkan.h"
 #endif
-#include "core_perks/patterns/test.h"

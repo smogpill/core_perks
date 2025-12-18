@@ -6,7 +6,7 @@
 namespace cp
 {
 	template <class T, class Iterator>
-	void erase_unordered(std::vector<T>& v, const Iterator& it)
+	void swap_and_pop(std::vector<T>& v, const Iterator& it)
 	{
 		if (it + 1 != v.end())
 			*it = std::move(v.back());
@@ -14,11 +14,11 @@ namespace cp
 	}
 
 	template <class T>
-	void erase_unordered_first(std::vector<T>& v, const T& element)
+	void swap_and_pop_first(std::vector<T>& v, const T& element)
 	{
 		auto it = std::find(v.begin(), v.end(), element);
 		if (it != v.end())
-			erase_unordered(v, it);
+			swap_and_pop(v, it);
 	}
 
 	template <class T>
