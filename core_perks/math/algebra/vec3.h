@@ -13,8 +13,6 @@ namespace cp
 		CP_FORCE_INLINE Vec3(T xyz) : x_(xyz), y_(xyz), z_(xyz) {}
 		CP_FORCE_INLINE Vec3(T x, T y, T z) : x_(x), y_(y), z_(z) {}
 
-		CP_FORCE_INLINE T square_length() const { return dot(*this, *this); }
-		CP_FORCE_INLINE T length() const { return sqrt(square_length()); }
 		CP_FORCE_INLINE T sum_elements() const { return x_ + y_ + z_; }
 		CP_FORCE_INLINE T min_element() const { return min(min(x_, y_), z_); }
 		CP_FORCE_INLINE T max_element() const { return max(max(x_, y_), z_); }
@@ -51,9 +49,40 @@ namespace cp
 		T z_ = 0;
 	};
 
-	using Vec3f = Vec3<float>;
-	using Vec3d = Vec3<double>;
-	using Vec3i = Vec3<int32>;
+	template <class T>
+	class alignas(16) Vec3fd : public Vec3<T>
+	{
+	public:
+		using Vec3<T>::Vec3;
+		using Vec3<T>::x_;
+		using Vec3<T>::y_;
+		using Vec3<T>::z_;
+		CP_FORCE_INLINE T square_length() const { return dot(*this, *this); }
+		CP_FORCE_INLINE T length() const { return sqrt(square_length()); }
+	};
+
+	template <class T>
+	class alignas(16) Vec3iu : public Vec3<T>
+	{
+	public:
+		using Vec3<T>::Vec3;
+		using Vec3<T>::x_;
+		using Vec3<T>::y_;
+		using Vec3<T>::z_;
+
+		CP_FORCE_INLINE bool all() const { return x_ && y_ && z_; }
+		CP_FORCE_INLINE bool any() const { return x_ || y_ || z_; }
+
+		CP_FORCE_INLINE Vec3iu operator|(const Vec3iu& o) const { return Vec3iu(x_ | o.x_, y_ | o.y_, z_ | o.z_); }
+		CP_FORCE_INLINE Vec3iu operator&(const Vec3iu& o) const { return Vec3iu(x_ & o.x_, y_ & o.y_, z_ & o.z_); }
+		CP_FORCE_INLINE Vec3iu& operator|=(const Vec3iu& o) { *this = *this | o; return *this; }
+		CP_FORCE_INLINE Vec3iu& operator&=(const Vec3iu& o) { *this = *this & o; return *this; }
+	};
+
+	using Vec3f = Vec3fd<float>;
+	using Vec3d = Vec3fd<double>;
+	using Vec3i = Vec3iu<int32>;
+	using Vec3u = Vec3iu<uint32>;
 
 	template <class T>
 	CP_FORCE_INLINE Vec3<T> operator*(T a, const Vec3<T>& v)
@@ -62,15 +91,15 @@ namespace cp
 	}
 
 	template <class T>
-	CP_FORCE_INLINE T dot(const Vec3<T>& a, const Vec3<T>& b)
+	CP_FORCE_INLINE T dot(const Vec3fd<T>& a, const Vec3fd<T>& b)
 	{
 		return a.x_ * b._x + a.y_ * b.y_ + a.z_ * b.z_;
 	}
 
 	template <class T>
-	CP_FORCE_INLINE T cross(const Vec3<T>& a, const Vec3<T>& b)
+	CP_FORCE_INLINE T cross(const Vec3fd<T>& a, const Vec3fd<T>& b)
 	{
-		return Vec3(a.y_ * b.z_ - a.z_ * b.y_, a.z_ * b.x_ - a.x_ * b.z_, a.x_ * b.y_ - a.y_ * b.x_);
+		return Vec3fd(a.y_ * b.z_ - a.z_ * b.y_, a.z_ * b.x_ - a.x_ * b.z_, a.x_ * b.y_ - a.y_ * b.x_);
 	}
 
 	template <class T>
@@ -80,12 +109,12 @@ namespace cp
 	}
 
 	template <class T>
-	CP_FORCE_INLINE Vec3<T> normalize(const Vec3<T>& a)
+	CP_FORCE_INLINE Vec3fd<T> normalize(const Vec3fd<T>& a)
 	{
 		const T len = a.length();
 		if (len > 1e-5f) [[likely]]
 			return a / len;
 		else
-			return Vec3<T>::zero();
+			return Vec3fd<T>::zero();
 	}
 }

@@ -10,8 +10,13 @@ namespace cp
 	class alignas(alignof(Vec3<T>)) AABox
 	{
 	public:
-		Vec3<T> min_;
-		Vec3<T> max_;
+		CP_FORCE_INLINE AABox() = default;
+		CP_FORCE_INLINE AABox(const Vec3<T>& min, const Vec3<T>& max) : min_(min), max_(max) {}
+
+		//CP_FORCE_INLINE bool empty() const { return min_ > max_; }
+
+		Vec3<T> min_ = 1e15f;
+		Vec3<T> max_ = -1e15f;
 	};
 
 	using AABoxf = AABox<float>;

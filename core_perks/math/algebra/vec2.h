@@ -5,10 +5,15 @@
 
 namespace cp
 {
-	class Vec2f
+	template <class T>
+	class Vec2
 	{
 	public:
-		float x_;
-		float y_;
+		T x_ = 0;
+		T y_ = 0;
 	};
+
+	using Vec2f = Vec2<float>;
+	using Vec2d = Vec2<double>;
+	using Vec2i = Vec2<int32>;
 }
