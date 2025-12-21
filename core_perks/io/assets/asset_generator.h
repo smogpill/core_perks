@@ -5,8 +5,12 @@
 
 namespace cp
 {
+	class Asset;
+
 	class AssetGenerator
 	{
-
+	public:
+		virtual ~AssetGenerator() = default;
+		virtual bool generate(Asset& asset) = 0;
 	};
 }

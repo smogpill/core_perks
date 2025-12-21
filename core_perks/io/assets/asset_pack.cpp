@@ -9,7 +9,6 @@ namespace cp
 {
 	CP_DEFINE_CLASS(AssetPack)
 	{
-
 	}
 
 	void AssetPack::add_resource(const UntypedAssetHandle& handle)

@@ -13,7 +13,7 @@ namespace cp
     {
     }
 
-    auto AssetLoader::get_asset_path() const -> std::string
+    std::string AssetLoader::get_asset_path() const
     {
         return _entry.get_asset_path();
     }
@@ -28,7 +28,7 @@ namespace cp
 
         // Open file in binary mode
         std::ifstream file(path, std::ios::binary | std::ios::ate);
-        CP_TRY(file.is_open(), "Failed to open file : {}", path.string());
+        CP_TRY(file.is_open(), "Failed to open file: {}", path.string());
 
         // Get file size
         std::streamsize size = file.tellg();
@@ -47,7 +47,7 @@ namespace cp
         return _entry.path_exists();
     }
 
-    auto AssetLoader::get_id() const -> const std::string&
+    const std::string& AssetLoader::get_id() const
     {
         return _entry.get_id();
     }

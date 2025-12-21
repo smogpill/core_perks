@@ -19,8 +19,8 @@ namespace cp
 
 		void release() { entry_.release(); }
 		void load_async(std::function<void(bool)> on_done = [](bool) {});
-		void unload_async();
 		void store_async(std::function<void(bool)> on_done = [](bool) {});
+		void unload_async();
 		std::string get_name() const;
 		const std::string& get_id() const;
 		//auto operator=(const UntypedResourceHandle& other) { entry_ = other.entry_; }
@@ -30,8 +30,8 @@ namespace cp
 		UntypedAssetHandle(AssetEntry* entry);
 
 		void set_id(const std::string& id, const Type& type);
-		Asset* get() const;
 		void set_resource(Asset* resource);
+		Asset* get() const;
 
 		cp::RefPtr<AssetEntry> entry_;
 	};

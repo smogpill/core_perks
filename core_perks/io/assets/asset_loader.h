@@ -19,9 +19,9 @@ namespace cp
 
 		AssetLoader(AssetEntry& entry);
 		template <class T>
-		auto add_dependency(const std::string& id, const DependencyOptions& options = DependencyOptions()) -> AssetHandle<T>;
-		auto get_id() const -> const std::string&;
-		auto get_asset_path() const -> std::string;
+		AssetHandle<T> add_dependency(const std::string& id, const DependencyOptions& options = DependencyOptions());
+		const std::string& get_id() const;
+		std::string get_asset_path() const;
 		bool read_as_binary_file(std::vector<uint8>& content);
 		bool path_exists() const;
 
@@ -30,7 +30,7 @@ namespace cp
 	};
 
 	template <class T>
-	auto AssetLoader::add_dependency(const std::string& id, const DependencyOptions& options) -> AssetHandle<T>
+	AssetHandle<T> AssetLoader::add_dependency(const std::string& id, const DependencyOptions& options)
 	{
 		AssetHandle<T> handle(id);
 		if (handle.entry_->path_exists() || !options._optional)

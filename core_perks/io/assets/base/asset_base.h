@@ -17,8 +17,16 @@ namespace cp
 		LOADING_DEPENDENCIES,
 		LOADING_SELF,
 		PROCESSING,
-		SERIALIZING,
-		RELEASING
+		STORING
+	};
+
+	union AssetPriority
+	{
+		uint32 raw_ = 0;
+		struct
+		{
+			uint32 unused : 32;
+		} bits_;
 	};
 
 	namespace hash

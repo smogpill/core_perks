@@ -37,6 +37,28 @@ namespace cp
 		requests_.push(request);
 	}
 
+	void AssetManager::process_requests()
+	{
+		for (;;)
+		{
+			UntypedAssetHandle handle;
+			{
+				std::scoped_lock lock(mutex_);
+				if (requests_.empty())
+					break;
+				handle = requests_.back();
+				requests_.pop();
+			}
+			AssetEntry* entry = handle.entry_;
+			entry->update_async();
+		}
+	}
+
+	void AssetManager::on_entry_updated(AssetEntry& entry)
+	{
+		process_requests();
+	}
+
 	AssetEntry* AssetManager::get_or_create_entry(const std::string& id, const Type& type)
 	{
 		const uint64 id_hash = hash::resource_id::hash64(id);
