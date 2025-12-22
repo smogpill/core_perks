@@ -6,6 +6,11 @@
 
 namespace cp
 {
+	MappedAssetData::MappedAssetData(const UntypedAssetHandle& asset)
+		: asset_(asset)
+	{
+	}
+
 	MappedAssetData::MappedAssetData(AssetProvider& provider, AssetEntry& entry, MappedRegion&& region)
 		: provider_(&provider), entry_(&entry), region_(std::move(region))
 	{

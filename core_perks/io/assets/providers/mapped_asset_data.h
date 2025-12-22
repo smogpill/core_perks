@@ -3,25 +3,26 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/io/assets/providers/mapped_region.h"
+#include "core_perks/io/assets/asset_handle.h"
 
 namespace cp
 {
-	class AssetEntry; class AssetProvider;
+	class Asset;
 
 	class MappedAssetData
 	{
 	public:
-		MappedAssetData() = default;
-		MappedAssetData(AssetProvider& provider, AssetEntry& entry, MappedRegion&& region);
+		MappedAssetData(const UntypedAssetHandle& asset);
 
+		bool mapped() const { return region_.mapped(); }
 		void* data() const { return region_.data(); }
 		uint64 size() const { return region_.size(); }
-		AssetEntry* get_entry() const { return entry_; }
-		AssetProvider* get_provider() const { return provider_; }
+		const UntypedAssetHandle& get_asset() const { return asset_; }
+		Asset* get_provider() const { return provider_; }
 
 	private:
-		AssetProvider* provider_ = nullptr;
-		AssetEntry* entry_= nullptr;
+		UntypedAssetHandle asset_ = nullptr;
+		Asset* provider_ = nullptr;
 		MappedRegion region_;
 	};
 }

@@ -10,8 +10,6 @@
 
 namespace cp
 {
-	class AssetProvider;
-
 	class AssetManager : public Singleton<AssetManager>
 	{
 	public:
@@ -30,7 +28,7 @@ namespace cp
 
 	private:
 		friend class AssetEntry;
-		friend class AssetProvider;
+		friend class Asset;
 		friend class UntypedAssetHandle;
 
 		AssetEntry* get_or_create_entry(const std::string& id, const Type& type);
@@ -45,7 +43,7 @@ namespace cp
 		std::queue<UntypedAssetHandle> requests_;
 		std::string assets_path_;
 		std::string cache_path_;
-		std::vector<AssetProvider*> providers_;
+		std::vector<Asset*> providers_;
 		uint max_parallel_updates_ = 4;
 
 		/*

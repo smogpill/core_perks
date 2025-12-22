@@ -8,14 +8,15 @@
 
 namespace cp
 {
-	class AssetPack : public Asset, public AssetProvider
+	class AssetPack : public Asset
 	{
+		CP_BASE(Asset);
 		CP_CLASS(AssetPack);
 	public:
 		void add_resource(const UntypedAssetHandle& handle);
 
 	protected:
-		virtual bool on_load(AssetEntry& entry) override;
+		virtual bool on_load(const MappedAssetData& data) override;
 		virtual MappedAssetData map_asset(AssetEntry& entry) override;
 		virtual void unmap_asset(MappedAssetData& data) override;
 
@@ -28,5 +29,6 @@ namespace cp
 		};
 		std::vector<SubAssetInfo> sub_assets_;
 		std::unorder_map<uint64, SubAssetInfo*> id_hash_to_sub_asset_;
+		FileHandle file_handle_;
 	};
 }

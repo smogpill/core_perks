@@ -65,7 +65,7 @@ namespace cp
 	MappedAssetData AssetManager::map_asset(AssetEntry& entry)
 	{
 		std::scoped_lock lock(mutex_);
-		for (AssetProvider* provider : providers_)
+		for (Asset* provider : providers_)
 		{
 			MappedAssetData data = provider->map_asset(entry);
 			if (data.data() != nullptr)

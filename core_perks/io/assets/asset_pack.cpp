@@ -11,14 +11,29 @@ namespace cp
 	{
 	}
 
+	namespace asset_pack
+	{
+		struct Entry
+		{
+			std::string asset_id_;
+			uint64 offset_ = 0;
+			uint64 size_ = 0;
+		};
+		struct Header
+		{
+			std::vector<Entry> entries_;
+		};
+	}
+
 	void AssetPack::add_resource(const UntypedAssetHandle& handle)
 	{
 		if (!contains(resources_, handle))
 			resources_.push_back(handle);
 	}
 
-	bool AssetPack::on_load(AssetEntry& entry)
+	bool AssetPack::on_load(const MappedAssetData& data)
 	{
+		CP_TRY(Base::on_load(data));
 		return false;
 	}
 
