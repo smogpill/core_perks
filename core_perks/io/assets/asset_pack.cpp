@@ -18,16 +18,12 @@ namespace cp
 		stream >> entry.size_;
 	}
 
-	void AssetPack::add_sub_resource(const AssetHandle& handle)
+	bool AssetPack::on_load()
 	{
-		if (!contains(resources_, handle))
-			resources_.push_back(handle);
-	}
+		CP_TRY(Base::on_load());
 
-	bool AssetPack::on_load(AssetEntry& entry)
-	{
-		CP_TRY(Base::on_load(data));
-
+		AssetEntry& entry = get_entry();
+		MappedAssetData data = entry.get_mapped_data();
 		BinaryInputStream stream = data.get_stream();
 		stream >> sub_assets_;
 		return true;
@@ -38,7 +34,18 @@ namespace cp
 		return MappedAssetData();
 	}
 
-	void AssetPack::unmap_sub_asset(MappedAssetData& data)
+	void AssetPack::unmap_sub_asset(const AssetHandle& asset)
 	{
+
+	}
+
+	AssetPack::SubAssetInfo* AssetPack::get_sub_resource_info(const AssetHandle& asset) const
+	{
+		for (SubAssetInfo& info : sub_assets_)
+		{
+			if (info.handle_ == asset)
+				return &info;
+		}
+		return nullptr;
 	}
 }

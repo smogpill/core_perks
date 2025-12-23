@@ -11,10 +11,10 @@ namespace cp
 		BinaryOutputStream();
 		~BinaryOutputStream();
 		void write(const void* buffer, uint64 size);
-		template <class T>
+		template <class T> requires std::is_trivially_copyable_v<T>
 		void write(const T& value);
 		uint64 size() const;
-		void output_to_buffer(void* dest_buffer);
+		void copy_to_buffer(void* dest_buffer);
 
 	private:
 		static constexpr uint32 block_size = 64 * 1024;
@@ -22,10 +22,34 @@ namespace cp
 		uint32 current_block_pos_ = 0;
 	};
 
-	template <class T>
+	template <class T> requires std::is_trivially_copyable_v<T>
 	CP_FORCE_INLINE void BinaryOutputStream::write(const T& value)
 	{
-		static_assert(std::is_trivially_copyable_v<T>);
 		write(&value, sizeof(T));
+	}
+
+	template <class T> requires std::is_trivially_copyable_v<T>
+	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const T& value) { stream.write(value); return stream; }
+	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const std::string& str);
+
+	template <class T>
+	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const std::vector<T>& v)
+	{
+		const uint32 size = (uint32)v.size();
+		stream << size;
+		if (size > 0)
+		{
+			if constexpr (std::is_trivially_copyable_v<T>)
+			{
+				stream.write(v.data(), size * sizeof(T));
+			}
+			else
+			{
+				for (uint32 i = 0; i < size; ++i)
+					stream << v[i];
+			}
+		}
+
+		return stream;
 	}
 }

@@ -385,4 +385,10 @@ namespace cp
                 });
         }
     }
+
+    MappedAssetData AssetEntry::get_mapped_data()
+    {
+		AssetManager& manager = AssetManager::get();
+		return manager.get_mapped_data(*this);
+    }
 }

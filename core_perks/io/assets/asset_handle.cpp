@@ -5,6 +5,8 @@
 #include "core_perks/io/assets/asset_handle.h"
 #include "core_perks/io/assets/asset_manager.h"
 #include "core_perks/io/assets/asset_entry.h"
+#include "core_perks/io/streams/binary_output_stream.h"
+#include "core_perks/io/streams/binary_input_stream.h"
 
 namespace cp
 {
@@ -67,5 +69,26 @@ namespace cp
 	Asset* AssetHandle::get() const
 	{
 		return entry_ ? entry_->get() : nullptr;
+	}
+
+	BinaryInputStream& operator>>(BinaryInputStream& stream, AssetHandle& handle)
+	{
+		std::string id;
+		stream >> id;
+		uint32 type_hash = 0;
+		stream >> type_hash;
+		const Type* type = Type::get_by_name_hash(type_hash);
+		if (type)
+			handle.set_id(id, *type);
+		return stream;
+	}
+
+	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const AssetHandle& handle)
+	{
+		const std::string id = handle.entry_ ? handle.entry_->get_id() : "";
+		stream << id;
+		const uint32 type_hash = handle.entry_ ? handle.entry_->get_type()->get_name_hash() : 0;
+		stream << type_hash;
+		return stream;
 	}
 }

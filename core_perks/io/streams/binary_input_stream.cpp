@@ -16,12 +16,13 @@ namespace cp
 	{
 	}
 
-	void operator>>(BinaryInputStream& stream, std::string& str)
+	BinaryInputStream& operator>>(BinaryInputStream& stream, std::string& str)
 	{
 		uint32 size = 0;
 		stream.read(size);
 		str.resize(size);
 		if (size > 0)
 			stream.read(str.data(), size);
+		return stream;
 	}
 }

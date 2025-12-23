@@ -6,6 +6,7 @@
 
 namespace cp
 {
+	/*
 	FolderAssetProvider::FolderAssetProvider(const std::string& path)
 		: folder_path_(path)
 	{
@@ -47,4 +48,5 @@ namespace cp
 		}
 		return nullptr;
 	}
+	*/
 }

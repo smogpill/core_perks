@@ -7,6 +7,7 @@
 
 namespace cp
 {
+	/*
 	class FolderAssetProvider : public AssetProvider
 	{
 	public:
@@ -30,4 +31,5 @@ namespace cp
 		std::filesystem::path folder_path_;
 		std::vector<AssetInfo*> open_files_;
 	};
+	*/
 }

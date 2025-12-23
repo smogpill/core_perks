@@ -6,8 +6,8 @@
 
 namespace cp
 {
-	class Asset;
-	class AssetEntry;
+	class Asset; class AssetEntry; class BinaryInputStream; class BinaryOutputStream; 
+	class Type;
 
 	class AssetHandle
 	{
@@ -28,6 +28,9 @@ namespace cp
 		operator bool() const { return entry_ != nullptr; }
 
 	protected:
+		friend BinaryInputStream& operator>>(BinaryInputStream& stream, AssetHandle& handle);
+		friend BinaryOutputStream& operator<<(BinaryOutputStream& stream, const AssetHandle& handle);
+
 		void set_id(const std::string& id, const Type& type);
 		void set_resource(Asset* resource);
 		Asset* get() const;

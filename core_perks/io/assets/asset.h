@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
+#include "core_perks/io/assets/providers/mapped_asset_data.h"
 
 namespace cp
 {
@@ -16,14 +17,17 @@ namespace cp
 	public:
 		virtual ~Asset() = default;
 
-		virtual bool on_load() = 0 { return true; }
+		virtual bool on_load() { return true; }
+		virtual void on_unload() {}
 		virtual bool on_dependency_loaded(AssetEntry& dependency) { return true; }
 		virtual bool on_all_dependencies_loaded() { return true; }
 		virtual void on_store(cp::BinaryOutputStream& stream) const {}
+		AssetEntry& get_entry() const { return *entry_; }
+		AssetHandle get_handle() const { return AssetHandle(entry_); }
 
 	protected:
-		virtual MappedAssetData map_sub_asset(const AssetHandle& asset) = 0 { return MappedAssetData(); }
-		virtual void unmap_sub_asset(MappedAssetData& mapped_data) = 0 {}
+		virtual MappedAssetData map_sub_asset(const AssetHandle& asset) = 0 { return MappedAssetData(asset); }
+		virtual void unmap_sub_asset(const AssetHandle& asset) = 0 {}
 	private:
 		friend class AssetEntry;
 

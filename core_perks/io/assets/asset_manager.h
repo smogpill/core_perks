@@ -23,8 +23,8 @@ namespace cp
 		void set_cache_path(const std::string& path);
 		const std::string& get_cache_path() const { return cache_path_; }
 
-		void register_provider(AssetProvider& provider);
-		void unregister_provider(AssetProvider& provider);
+		void register_provider(Asset& provider);
+		void unregister_provider(Asset& provider);
 
 	private:
 		friend class AssetEntry;

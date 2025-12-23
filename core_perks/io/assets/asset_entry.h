@@ -4,6 +4,7 @@
 #pragma once
 #include "core_perks/io/assets/base/asset_base.h"
 #include "core_perks/io/assets/asset_handle.h"
+#include "core_perks/io/assets/providers/mapped_asset_data.h"
 #include "core_perks/patterns/reference.h"
 
 namespace cp
@@ -43,6 +44,7 @@ namespace cp
 		bool is_ready() const { return state_ == AssetState::READY; }
 		void update_async();
 		MappedAssetData get_mapped_data();
+		const Type* get_type() const { return type_; }
 
 	private:
 		friend class AssetLoader;
@@ -61,7 +63,7 @@ namespace cp
 		std::string id_;
 		uint64 id_hash_ = 0;
 		AssetPriority priority_;
-		const cp::Type* type_ = nullptr;
+		const Type* type_ = nullptr;
 		RefPtr<AssetEntry> loading_parent_;
 		std::atomic<uint32> nb_loading_dependencies_ = 0;
 		std::mutex callback_mutex_;

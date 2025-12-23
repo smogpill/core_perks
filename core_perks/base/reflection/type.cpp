@@ -14,10 +14,13 @@ namespace cp
 		, _name_hash(hash::fast::hash32(_name))
 	{
 		get_types().push_back(this);
+		CP_ASSERT(get_name_hash_to_type_map().find(_name_hash) == get_name_hash_to_type_map().end());
+		get_name_hash_to_type_map()[_name_hash] = this;
 	}
 
 	Type::~Type()
 	{
+		get_name_hash_to_type_map().erase(_name_hash);
 		swap_and_pop_first(get_types(), this);
 	}
 
@@ -34,6 +37,15 @@ namespace cp
 			_base->init(type);
 		if (_init)
 			_init(*type);
+	}
+
+	Type* Type::get_by_name_hash(uint32 name_hash)
+	{
+		const auto& map = get_name_hash_to_type_map();
+		auto it = map.find(name_hash);
+		if (it != map.end())
+			return it->second;
+		return nullptr;
 	}
 
 	bool Type::is_a(const Type& type) const
@@ -61,5 +73,11 @@ namespace cp
 	{
 		static std::vector<Type*> types;
 		return types;
+	}
+
+	std::unordered_map<uint32, Type*>& Type::get_name_hash_to_type_map()
+	{
+		static std::unordered_map<uint32, Type*> map;
+		return map;
 	}
 }

@@ -7,6 +7,7 @@
 
 namespace cp
 {
+	/*
 	class MappedFileAssetProvider : public AssetProvider
 	{
 	public:
@@ -20,4 +21,5 @@ namespace cp
 	private:
 		FileHandle file_handle_;
 	};
+	*/
 }

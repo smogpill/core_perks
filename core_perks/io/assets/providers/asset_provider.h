@@ -8,6 +8,8 @@ namespace cp
 {
 	class AssetEntry;
 
+	/*
+
 	class AssetProvider
 	{
 	public:
@@ -19,4 +21,5 @@ namespace cp
 		friend class MappedAssetData;
 		void unmap_asset(MappedAssetData& data) = 0;
 	};
+	*/
 }

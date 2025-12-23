@@ -16,11 +16,13 @@ namespace cp
 		CP_CLASS(AssetFolder);
 	public:
 		AssetFolder(const std::string& path);
+		~AssetFolder() override;
 
 	protected:
 		bool on_load() override;
+		void on_unload() override;
 		MappedAssetData map_sub_asset(const AssetHandle& asset) override;
-		void unmap_sub_asset(MappedAssetData& mapped_data) override;
+		void unmap_sub_asset(const AssetHandle& asset) override;
 
 	private:
 		struct AssetInfo
@@ -29,8 +31,8 @@ namespace cp
 			uint64 asset_id_hash_ = 0;
 		};
 
-		AssetInfo& get_or_open_file(const AssetEntry& entry);
-		AssetInfo* get_file(const AssetEntry& entry) const;
+		AssetInfo& get_or_open_file(const AssetHandle& asset);
+		AssetInfo* get_file(const AssetHandle& asset) const;
 
 		std::filesystem::path path_;
 		std::vector<AssetInfo*> open_files_;

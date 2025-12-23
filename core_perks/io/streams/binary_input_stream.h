@@ -12,7 +12,7 @@ namespace cp
 		BinaryInputStream(const void* data, const void* data_end);
 
 		void read(void* buffer, uint64 size);
-		template <class T>
+		template <class T> requires std::is_trivially_copyable_v<T>
 		void read(T& value);
 
 	private:
@@ -36,19 +36,18 @@ namespace cp
 		}
 	}
 
-	template <class T>
+	template <class T> requires std::is_trivially_copyable_v<T>
 	CP_FORCE_INLINE void BinaryInputStream::read(T& value)
 	{
-		static_assert(std::is_trivially_copyable_v<T>);
 		read(&value, sizeof(T));
 	}
 
-	template <class T>
-	void operator>>(BinaryInputStream& stream, T& value) { stream.read(value); }
-	void operator>>(BinaryInputStream& stream, std::string& str);
+	template <class T> requires std::is_trivially_copyable_v<T>
+	BinaryInputStream& operator>>(BinaryInputStream& stream, T& value) { stream.read(value); return stream; }
+	BinaryInputStream& operator>>(BinaryInputStream& stream, std::string& str);
 
 	template <class T>
-	void operator>>(BinaryInputStream& stream, std::vector<T>& v)
+	BinaryInputStream& operator>>(BinaryInputStream& stream, std::vector<T>& v)
 	{
 		uint32 size = 0;
 		stream >> size;
@@ -65,5 +64,6 @@ namespace cp
 					stream >> v[i];
 			}
 		}
+		return stream;
 	}
 }

@@ -74,14 +74,14 @@ namespace cp
 		return MappedAssetData();
 	}
 
-	void AssetManager::register_provider(AssetProvider& provider)
+	void AssetManager::register_provider(Asset& provider)
 	{
 		std::scoped_lock lock(mutex_);
 		CP_ASSERT(!contains(providers_, &provider));
 		providers_.push_back(&provider);
 	}
 
-	void AssetManager::unregister_provider(AssetProvider& provider)
+	void AssetManager::unregister_provider(Asset& provider)
 	{
 		std::scoped_lock lock(mutex_);
 		erase_first(providers_, &provider);

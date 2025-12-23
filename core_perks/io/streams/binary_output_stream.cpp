@@ -43,7 +43,7 @@ namespace cp
 		return static_cast<uint64>(blocks_.size() - 1) * block_size + current_block_pos_;
 	}
 
-	void BinaryOutputStream::output_to_buffer(void* dest_buffer)
+	void BinaryOutputStream::copy_to_buffer(void* dest_buffer)
 	{
 		uint8* dest = static_cast<uint8*>(dest_buffer);
 		const uint block_count_minus_one = (uint)blocks_.size() - 1;
@@ -55,5 +55,12 @@ namespace cp
 
 		if (current_block_pos_)
 			std::memcpy(dest, blocks_.back(), current_block_pos_);
+	}
+
+	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const std::string& str)
+	{
+		stream << (uint32)str.size();
+		stream.write(str.data(), str.size());
+		return stream;
 	}
 }

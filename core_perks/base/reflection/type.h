@@ -107,7 +107,10 @@ namespace cp
 		void copy_construct(void* ptr, const void* from) const { _copy_construct(ptr, from); }
 		void destruct(void* ptr) const { _destruct(ptr); }
 		template <class T>
-		static auto get() -> Type* { return detail::TypeStatic<T>::get_type_static(); }
+		static Type* get() { return detail::TypeStatic<T>::get_type_static(); }
+		static Type* get_by_name_hash(uint32 name_hash);
+		const std::string& get_name() const { return _name; }
+		uint32 get_name_hash() const { return _name_hash; }
 		bool is_a(const Type& type) const;
 		std::vector<Type*> get_derived() const;
 
@@ -136,6 +139,7 @@ namespace cp
 		std::string _name;
 
 		static std::vector<Type*>& get_types();
+		static std::unordered_map<uint32, Type*>& get_name_hash_to_type_map();
 	};
 
 	template <class T>
