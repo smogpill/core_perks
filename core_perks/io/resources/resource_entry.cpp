@@ -2,53 +2,53 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/io/assets/base/asset_base.h"
-#include "core_perks/io/assets/asset_entry.h"
-#include "core_perks/io/assets/asset_manager.h"
-#include "core_perks/io/assets/asset_loader.h"
-#include "core_perks/io/assets/asset_generator.h"
-#include "core_perks/io/assets/asset.h"
+#include "core_perks/io/resources/base/resource_base.h"
+#include "core_perks/io/resources/resource_entry.h"
+#include "core_perks/io/resources/resource_manager.h"
+#include "core_perks/io/resources/resource_loader.h"
+#include "core_perks/io/resources/resource_generator.h"
+#include "core_perks/io/resources/resource.h"
 #include "core_perks/io/streams.h"
 #include "core_perks/math/numerical/hash.h"
 #include "core_perks/threading/job/job_system.h"
 
 namespace cp
 {
-    AssetEntry::AssetEntry(const HashedString& id, const Type& type)
+    ResourceEntry::ResourceEntry(const HashedString& id, const Type& type)
         : id_(id)
         , type_(&type)
     {
     }
 
-    AssetEntry::~AssetEntry()
+    ResourceEntry::~ResourceEntry()
     {
         delete resource_;
         delete loading_resource_;
     }
 
-    void AssetEntry::add_loading_dependency()
+    void ResourceEntry::add_loading_dependency()
     {
         ++nb_loading_dependencies_;
     }
 
-    void AssetEntry::remove_loading_dependency()
+    void ResourceEntry::remove_loading_dependency()
     {
         if (--nb_loading_dependencies_ != 0)
             return;
     }
 
-    void AssetEntry::on_all_refs_removed()
+    void ResourceEntry::on_all_refs_removed()
     {
         Base::on_all_refs_removed();
     }
 
-    void AssetEntry::add_load_callback(Callback callback)
+    void ResourceEntry::add_load_callback(Callback callback)
     {
         std::scoped_lock lock(callback_mutex_);
         switch (state_)
         {
-        case AssetState::READY:
-        case AssetState::FAILED:
+        case ResourceState::READY:
+        case ResourceState::FAILED:
         {
             queue_async_callback(std::move(callback));
             break;
@@ -61,51 +61,51 @@ namespace cp
         }
     }
 
-    void AssetEntry::on_update_async()
+    void ResourceEntry::on_update_async()
     {
         std::scoped_lock lock(mutex_);
         for (;;)
         {
-            const AssetState target_state = user_refs_ ? AssetState::READY : AssetState::NONE;
+            const ResourceState target_state = user_refs_ ? ResourceState::READY : ResourceState::NONE;
             if (state_ == target_state)
                 break;
 
-            if (target_state == AssetState::READY)
+            if (target_state == ResourceState::READY)
             {
                 switch (state_)
                 {
                     switch (state_)
                     {
-                    case AssetState::NONE:
+                    case ResourceState::NONE:
                     {
 
                         break;
                     }
-                    case AssetState::READY:
+                    case ResourceState::READY:
                     {
                         break;
                     }
-                    case AssetState::FAILED:
+                    case ResourceState::FAILED:
                     {
                         break;
                     }
-                    case AssetState::LOADING_DEPENDENCIES:
+                    case ResourceState::LOADING_DEPENDENCIES:
                     {
                         break;
                     }
-                    case AssetState::LOADING_SELF:
+                    case ResourceState::LOADING_SELF:
                     {
                         break;
                     }
-                    case AssetState::PROCESSING:
+                    case ResourceState::PROCESSING:
                     {
                         break;
                     }
-                    case AssetState::STORING:
+                    case ResourceState::STORING:
                     {
                         break;
                     }
-                    case AssetState::UNLOADING:
+                    case ResourceState::UNLOADING:
                     {
                         break;
                     }
@@ -123,44 +123,44 @@ namespace cp
         }
     }
 
-    void AssetEntry::on_load_dependencies()
+    void ResourceEntry::on_load_dependencies()
     {
         std::scoped_lock lock(mutex_);
         if (dependencies_.empty())
         {
-			state_ = AssetState::LOADING_SELF;
+			state_ = ResourceState::LOADING_SELF;
             return;
         }
-        state_ = AssetState::LOADING_DEPENDENCIES;
+        state_ = ResourceState::LOADING_DEPENDENCIES;
         nb_loading_dependencies_ = dependencies_.size();
-        for (AssetHandle& dep : dependencies_)
+        for (ResourceHandle& dep : dependencies_)
             dep.load_async(&on_dependency_loaded);
     }
 
-    void AssetEntry::on_dependency_loaded(AssetEntry& entry)
+    void ResourceEntry::on_dependency_loaded(ResourceEntry& entry)
     {
         if (nb_loading_dependencies_.fetch_sub(1) > 1)
             return;
 
         std::scoped_lock lock(mutex_);
-        for (const AssetHandle& dep : dependencies_)
+        for (const ResourceHandle& dep : dependencies_)
             if (!dep->is_ready())
             {
-                state_ = AssetState::FAILED;
+                state_ = ResourceState::FAILED;
                 return;
             }
 
-        state_ = AssetState::LOADING_SELF;
+        state_ = ResourceState::LOADING_SELF;
     }
 
-    void AssetEntry::flush_load_callbacks()
+    void ResourceEntry::flush_load_callbacks()
     {
 		std::vector<Callback> callbacks = std::move(load_callbacks_);
         for (auto& callback : callbacks)
             queue_async_callback(std::move(callback));
     }
 
-    void AssetEntry::queue_async_callback(Callback&& callback)
+    void ResourceEntry::queue_async_callback(Callback&& callback)
     {
         add_ref();
         auto job = [this, callback = std::move(callback)]()
@@ -171,47 +171,47 @@ namespace cp
 		JobSystem::get().enqeue(job);
     }
 
-    Asset* AssetEntry::create_resource()
+    Resource* ResourceEntry::create_resource()
     {
         CP_ASSERT(type_);
-        Asset* resource = type_->create<Asset>();
+        Resource* resource = type_->create<Resource>();
         resource->entry_ = this;
         return resource;
     }
 
-    void AssetEntry::on_load()
+    void ResourceEntry::on_load()
     {
         std::scoped_lock lock(mutex_);
-		std::unique_ptr<Asset> resource(create_resource());
-        if (!resource->on_load(AssetLoader(*this)))
+		std::unique_ptr<Resource> resource(create_resource());
+        if (!resource->on_load(ResourceLoader(*this)))
         {
-            state_ = AssetState::FAILED;
+            state_ = ResourceState::FAILED;
             return;
         }
 
-        Asset* old_resource = resource_.exchange(resource.release());
+        Resource* old_resource = resource_.exchange(resource.release());
         delete old_resource;
-        state_ = AssetState::READY;
+        state_ = ResourceState::READY;
     }
 
-    void AssetEntry::on_unload()
+    void ResourceEntry::on_unload()
     {
         std::scoped_lock lock(mutex_);
-        for (AssetHandle& dep : dependencies_)
+        for (ResourceHandle& dep : dependencies_)
             dep.unload_async();
     }
 
-    void AssetEntry::load_async(Callback on_done)
+    void ResourceEntry::load_async(Callback on_done)
     {
-        AssetState expected = AssetState::NONE;
-        if (!target_state_.compare_exchange_strong(expected, AssetState::READY))
+        ResourceState expected = ResourceState::NONE;
+        if (!target_state_.compare_exchange_strong(expected, ResourceState::READY))
         {
 
         }
         add_load_callback(on_done);
         
         /*
-        if (state_.compare_exchange_strong(expected, AssetState::LOADING))
+        if (state_.compare_exchange_strong(expected, ResourceState::LOADING))
         {
             add_ref();
             JobSystem::get().enqeue([this]()
@@ -229,47 +229,47 @@ namespace cp
         */
     }
 
-    void AssetEntry::unload_async()
+    void ResourceEntry::unload_async()
     {
 		std::mutex lock(mutex_);
-        if (state_ == AssetState::READY)
+        if (state_ == ResourceState::READY)
         {
 
         }
-        AssetState expected = AssetState::READY;
-        if (state_.compare_exchange_strong(expected, AssetState::RELEASING))
+        ResourceState expected = ResourceState::READY;
+        if (state_.compare_exchange_strong(expected, ResourceState::RELEASING))
         {
             
         }
     }
 
-    void AssetEntry::store_async(Callback on_done)
+    void ResourceEntry::store_async(Callback on_done)
     {
         add_ref();
 
         JobSystem::get().enqeue([this, callback = std::move(on_done)]()
             {
-                AssetState expected = AssetState::READY;
-                while (!state_.compare_exchange_weak(expected, AssetState::SERIALIZING))
+                ResourceState expected = ResourceState::READY;
+                while (!state_.compare_exchange_weak(expected, ResourceState::SERIALIZING))
                 {
-                    if (expected != AssetState::SERIALIZING)
+                    if (expected != ResourceState::SERIALIZING)
                     {
                         callback(false);
                         return;
                     }
-                    expected = AssetState::READY;
+                    expected = ResourceState::READY;
                 }
-                const Asset* resource = resource_;
+                const Resource* resource = resource_;
                 cp::BinaryOutputStream stream;
                 resource->on_store(stream);
 
-                expected = AssetState::SERIALIZING;
-                const bool was_serializing = state_.compare_exchange_strong(expected, AssetState::READY);
+                expected = ResourceState::SERIALIZING;
+                const bool was_serializing = state_.compare_exchange_strong(expected, ResourceState::READY);
                 CP_ASSERT(was_serializing);
 
                 namespace fs = std::filesystem;
 
-                const fs::path file_path = get_asset_path();
+                const fs::path file_path = get_resource_path();
 
                 remove_ref();
 
@@ -304,32 +304,32 @@ namespace cp
             });
     }
 
-    bool AssetEntry::path_exists() const
+    bool ResourceEntry::path_exists() const
     {
-        return std::filesystem::exists(get_asset_path());
+        return std::filesystem::exists(get_resource_path());
     }
 
-    std::string AssetEntry::get_name() const
+    std::string ResourceEntry::get_name() const
     {
         const size_t pos = id_.find_last_of('/');
         return (pos == std::string::npos) ? id_ : id_.substr(pos + 1);
     }
 
-    void AssetEntry::set(Asset* resource)
+    void ResourceEntry::set(Resource* resource)
     {
-        Asset* old_resource = resource_.exchange(resource);
+        Resource* old_resource = resource_.exchange(resource);
         delete old_resource;
     }
 
-    std::string AssetEntry::get_asset_path() const
+    std::string ResourceEntry::get_resource_path() const
     {
-        return (std::filesystem::path(AssetManager::get().get_assets_path()) / get_id()).string();
+        return (std::filesystem::path(ResourceManager::get().get_assets_path()) / get_id()).string();
     }
 
-    void AssetEntry::update_async()
+    void ResourceEntry::update_async()
     {
         std::scoped_lock lock(mutex_);
-		const AssetState target_state = user_refs_ ? AssetState::READY : AssetState::NONE;
+		const ResourceState target_state = user_refs_ ? ResourceState::READY : ResourceState::NONE;
         if (target_state != state_)
         {
             add_ref();
@@ -341,9 +341,9 @@ namespace cp
         }
     }
 
-    MappedAssetData AssetEntry::get_mapped_data()
+    MappedResourceData ResourceEntry::get_mapped_data()
     {
-		AssetManager& manager = AssetManager::get();
+		ResourceManager& manager = ResourceManager::get();
 		return manager.get_mapped_data(*this);
     }
 }

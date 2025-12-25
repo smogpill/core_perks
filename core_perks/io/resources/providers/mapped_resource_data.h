@@ -3,30 +3,29 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/io/file.h"
-#include "core_perks/io/assets/providers/mapped_asset_data.h"
-#include "core_perks/io/assets/asset_handle.h"
+#include "core_perks/io/resources/resource_handle.h"
 #include "core_perks/io/streams/binary_input_stream.h"
 
 namespace cp
 {
-	class Asset;
+	class Resource;
 
-	class MappedAssetData
+	class MappedResourceData
 	{
 	public:
-		MappedAssetData(const AssetHandle& asset);
-		MappedAssetData(const AssetHandle& asset, const AssetHandle& provider, MappedRegion&& region);
+		MappedResourceData(const ResourceHandle& resource);
+		MappedResourceData(const ResourceHandle& resource, const ResourceHandle& provider, MappedRegion&& region);
 
 		bool mapped() const { return region_.is_mapped(); }
 		void* data() { return region_.data(); }
 		uint64 size() const { return region_.size(); }
-		const AssetHandle& get_asset() const { return asset_; }
-		const AssetHandle& get_provider() const { return provider_; }
+		const ResourceHandle& get_resource() const { return resource_; }
+		const ResourceHandle& get_provider() const { return provider_; }
 		BinaryInputStream get_stream() { return BinaryInputStream(data(), size()); }
 
 	private:
-		AssetHandle asset_;
-		AssetHandle provider_;
+		ResourceHandle resource_;
+		ResourceHandle provider_;
 		MappedRegion region_;
 	};
 }

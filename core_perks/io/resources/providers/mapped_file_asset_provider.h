@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "core_perks/io/assets/providers/asset_provider.h"
+#include "core_perks/io/resources/providers/asset_provider.h"
 #include "core_perks/io/file.h"
 
 namespace cp
@@ -15,8 +15,8 @@ namespace cp
 		~MappedFileAssetProvider() override;
 
 	protected:
-		MappedAssetData map_asset(AssetEntry& entry) override;
-		void unmap_asset(MappedAssetData& data) override;
+		MappedResourceData map_resource(ResourceEntry& entry) override;
+		void unmap_asset(MappedResourceData& data) override;
 		
 	private:
 		FileHandle file_handle_;

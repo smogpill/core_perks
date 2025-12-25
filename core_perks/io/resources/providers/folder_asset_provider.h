@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "core_perks/io/assets/providers/asset_provider.h"
+#include "core_perks/io/resources/providers/asset_provider.h"
 #include "core_perks/io/file.h"
 
 namespace cp
@@ -13,23 +13,23 @@ namespace cp
 	public:
 		FolderAssetProvider(const std::string& path);
 
-		MappedAssetData map_asset(AssetEntry& entry) override;
+		MappedResourceData map_resource(ResourceEntry& entry) override;
 
 	protected:
-		void unmap_asset(MappedAssetData& data) override;
+		void unmap_asset(MappedResourceData& data) override;
 
 	private:
-		struct AssetInfo
+		struct ResourceInfo
 		{
 			FileHandle file_;
-			uint64 asset_id_hash_ = 0;
+			uint64 resource_id_hash_ = 0;
 		};
 
-		AssetInfo& get_or_open_file(const AssetEntry& entry);
-		AssetInfo* get_file(const AssetEntry& entry) const;
+		ResourceInfo& get_or_open_file(const ResourceEntry& entry);
+		ResourceInfo* get_file(const ResourceEntry& entry) const;
 
 		std::filesystem::path folder_path_;
-		std::vector<AssetInfo*> open_files_;
+		std::vector<ResourceInfo*> open_files_;
 	};
 	*/
 }

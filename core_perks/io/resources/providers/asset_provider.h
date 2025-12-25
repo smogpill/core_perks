@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "core_perks/io/assets/providers/mapped_asset_data.h"
+#include "core_perks/io/resources/providers/mapped_resource_data.h"
 
 namespace cp
 {
-	class AssetEntry;
+	class ResourceEntry;
 
 	/*
 
@@ -15,11 +15,11 @@ namespace cp
 	public:
 		virtual ~AssetProvider() = default;
 
-		MappedAssetData map_asset(AssetEntry& entry) = 0;
+		MappedResourceData map_resource(ResourceEntry& entry) = 0;
 
 	protected:
-		friend class MappedAssetData;
-		void unmap_asset(MappedAssetData& data) = 0;
+		friend class MappedResourceData;
+		void unmap_asset(MappedResourceData& data) = 0;
 	};
 	*/
 }

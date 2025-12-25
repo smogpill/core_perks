@@ -6,21 +6,21 @@
 
 namespace cp
 {
-	class Asset; class AssetEntry; class BinaryInputStream; class BinaryOutputStream; 
+	class Resource; class ResourceEntry; class BinaryInputStream; class BinaryOutputStream; 
 	class Type; class HashedString;
 
-	class AssetHandle
+	class ResourceHandle
 	{
 	public:
-		AssetHandle() = default;
-		explicit AssetHandle(AssetEntry* entry);
-		AssetHandle(const HashedString& id, const Type& type);
-		~AssetHandle() = default;
+		ResourceHandle() = default;
+		explicit ResourceHandle(ResourceEntry* entry);
+		ResourceHandle(const HashedString& id, const Type& type);
+		~ResourceHandle() = default;
 		//UntypedResourceHandle(const UntypedResourceHandle& other) : entry_(other.entry_) {}
 
 		void release() { entry_.release(); }
-		void load_async(std::function<void(AssetEntry&)> on_done = [](AssetEntry&) {});
-		void store_async(std::function<void(AssetEntry&)> on_done = [](AssetEntry&) {});
+		void load_async(std::function<void(ResourceEntry&)> on_done = [](ResourceEntry&) {});
+		void store_async(std::function<void(ResourceEntry&)> on_done = [](ResourceEntry&) {});
 		void unload_async();
 		std::string get_name() const;
 		const HashedString& get_id() const;
@@ -28,28 +28,28 @@ namespace cp
 		operator bool() const { return entry_ != nullptr; }
 
 	protected:
-		friend class AssetManager;
-		friend BinaryInputStream& operator>>(BinaryInputStream& stream, AssetHandle& handle);
-		friend BinaryOutputStream& operator<<(BinaryOutputStream& stream, const AssetHandle& handle);
+		friend class ResourceManager;
+		friend BinaryInputStream& operator>>(BinaryInputStream& stream, ResourceHandle& handle);
+		friend BinaryOutputStream& operator<<(BinaryOutputStream& stream, const ResourceHandle& handle);
 
 		void set(const HashedString& id, const Type& type);
 		template <class T>
-		void set(const HashedString& id) { set(id, T::get_type_static(); }
-		Asset* get() const;
+		void set(const HashedString& id) { set(id, T::get_type_static()); }
+		Resource* get() const;
 
-		cp::RefPtr<AssetEntry> entry_;
+		cp::RefPtr<ResourceEntry> entry_;
 	};
 
 	template <class T>
-	class TypedAssetHandle : public AssetHandle
+	class TypedResourceHandle : public ResourceHandle
 	{
-		using Base = AssetHandle;
+		using Base = ResourceHandle;
 	public:
-		using Base::AssetHandle;
+		using Base::ResourceHandle;
 		using Base::operator=;
 
-		TypedAssetHandle() = default;
-		TypedAssetHandle(const HashedString& id) : Base(id, T::get_type_static()) {}
+		TypedResourceHandle() = default;
+		TypedResourceHandle(const HashedString& id) : Base(id, T::get_type_static()) {}
 		/*
 		ResourceHandle() = default;
 		ResourceHandle(const HashedString& id);
@@ -63,7 +63,7 @@ namespace cp
 		//auto operator=(const ResourceHandle& other) -> ResourceHandle& { entry_ = other.entry_; return *this; }
 
 	private:
-		friend class AssetManager;
-		friend class AssetLoader;
+		friend class ResourceManager;
+		friend class ResourceLoader;
 	};
 }

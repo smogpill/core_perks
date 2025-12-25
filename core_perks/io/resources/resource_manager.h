@@ -3,17 +3,17 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/patterns/singleton.h"
-#include "core_perks/io/assets/asset.h"
-#include "core_perks/io/assets/asset_entry.h"
-#include "core_perks/io/assets/asset_handle.h"
-#include "core_perks/io/assets/providers/mapped_asset_data.h"
+#include "core_perks/io/resources/resource.h"
+#include "core_perks/io/resources/resource_entry.h"
+#include "core_perks/io/resources/resource_handle.h"
+#include "core_perks/io/resources/providers/mapped_resource_data.h"
 
 namespace cp
 {
-	class AssetManager : public Singleton<AssetManager>
+	class ResourceManager : public Singleton<ResourceManager>
 	{
 	public:
-		~AssetManager();
+		~ResourceManager();
 
 		// Assets path
 		void set_assets_path(const std::string& path);
@@ -23,27 +23,27 @@ namespace cp
 		void set_cache_path(const std::string& path);
 		const std::string& get_cache_path() const { return cache_path_; }
 
-		void register_provider(Asset& provider);
-		void unregister_provider(Asset& provider);
+		void register_provider(Resource& provider);
+		void unregister_provider(Resource& provider);
 
 	private:
-		friend class AssetEntry;
-		friend class Asset;
-		friend class AssetHandle;
+		friend class ResourceEntry;
+		friend class Resource;
+		friend class ResourceHandle;
 
-		AssetEntry* get_or_create_entry(const HashedString& id, const Type& type);
-		void destroy_entry(AssetEntry& entry);
-		void add_request(const AssetHandle& request);
+		ResourceEntry* get_or_create_entry(const HashedString& id, const Type& type);
+		void destroy_entry(ResourceEntry& entry);
+		void add_request(const ResourceHandle& request);
 		void process_requests();
-		void on_entry_updated(AssetEntry& entry);
-		MappedAssetData map_asset(const AssetHandle& asset);
+		void on_entry_updated(ResourceEntry& entry);
+		MappedResourceData map_resource(const ResourceHandle& resource);
 
 		mutable std::mutex mutex_;
-		std::unordered_map<uint64, AssetEntry*> map_;
-		std::queue<AssetHandle> requests_;
+		std::unordered_map<uint64, ResourceEntry*> map_;
+		std::queue<ResourceHandle> requests_;
 		std::string assets_path_;
 		std::string cache_path_;
-		std::vector<Asset*> providers_;
+		std::vector<Resource*> providers_;
 		uint max_parallel_updates_ = 4;
 
 		/*

@@ -6,7 +6,7 @@
 
 namespace cp
 {
-	enum class AssetState
+	enum class ResourceState
 	{
 		// Stable states
 		NONE,
@@ -20,7 +20,7 @@ namespace cp
 		STORING
 	};
 
-	union AssetPriority
+	union ResourcePriority
 	{
 		uint32 raw_ = 0;
 		struct

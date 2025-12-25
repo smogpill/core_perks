@@ -2,26 +2,26 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/io/assets/asset_loader.h"
-#include "core_perks/io/assets/asset_entry.h"
-#include "core_perks/io/assets/asset_manager.h"
+#include "core_perks/io/resources/resource_loader.h"
+#include "core_perks/io/resources/resource_entry.h"
+#include "core_perks/io/resources/resource_manager.h"
 
 namespace cp
 {
-    AssetLoader::AssetLoader(AssetEntry& entry)
+    ResourceLoader::ResourceLoader(ResourceEntry& entry)
         : _entry(entry)
     {
     }
 
-    std::string AssetLoader::get_asset_path() const
+    std::string ResourceLoader::get_resource_path() const
     {
-        return _entry.get_asset_path();
+        return _entry.get_resource_path();
     }
 
-    bool AssetLoader::read_as_binary_file(std::vector<uint8>& content)
+    bool ResourceLoader::read_as_binary_file(std::vector<uint8>& content)
     {
         namespace fs = std::filesystem;
-        const std::filesystem::path path = get_asset_path();
+        const std::filesystem::path path = get_resource_path();
 
         CP_TRY(fs::exists(path), "File does not exist: {}", path.string());
         CP_TRY(fs::is_regular_file(path), "Path is not a regular file: {}", path.string());
@@ -42,12 +42,12 @@ namespace cp
         return true;
     }
 
-    bool AssetLoader::path_exists() const
+    bool ResourceLoader::path_exists() const
     {
         return _entry.path_exists();
     }
 
-    const HashedString& AssetLoader::get_id() const
+    const HashedString& ResourceLoader::get_id() const
     {
         return _entry.get_id();
     }

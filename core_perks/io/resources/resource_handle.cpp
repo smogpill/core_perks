@@ -2,71 +2,63 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/io/assets/asset_handle.h"
-#include "core_perks/io/assets/asset_manager.h"
-#include "core_perks/io/assets/asset_entry.h"
+#include "core_perks/io/resources/resource_handle.h"
+#include "core_perks/io/resources/resource_manager.h"
+#include "core_perks/io/resources/resource_entry.h"
 #include "core_perks/io/streams/binary_output_stream.h"
 #include "core_perks/io/streams/binary_input_stream.h"
 
 namespace cp
 {
-	AssetHandle::AssetHandle(const HashedString& id, const Type& type)
-		: entry_(AssetManager::get().get_or_create_entry(id, type))
+	ResourceHandle::ResourceHandle(const HashedString& id, const Type& type)
+		: entry_(ResourceManager::get().get_or_create_entry(id, type))
 	{
 	}
 
-	AssetHandle::AssetHandle(AssetEntry* entry)
+	ResourceHandle::ResourceHandle(ResourceEntry* entry)
 		: entry_(entry)
 	{
 	}
 
-	void AssetHandle::set(const HashedString& id, const Type& type)
+	void ResourceHandle::set(const HashedString& id, const Type& type)
 	{
-		entry_ = AssetManager::get().get_or_create_entry(id, type);
+		entry_ = ResourceManager::get().get_or_create_entry(id, type);
 	}
 
-	void AssetHandle::set_resource(Asset* resource)
-	{
-		if (entry_)
-			entry_->set(resource);
-		else
-			delete resource;
-	}
-
-	void AssetHandle::unload_async()
+	void ResourceHandle::unload_async()
 	{
 		if (entry_)
 			entry_->unload_async();
 	}
 
-	void AssetHandle::store_async(std::function<void(AssetEntry&)> on_done)
+	void ResourceHandle::store_async(std::function<void(ResourceEntry&)> on_done)
 	{
 		if (entry_)
 			entry_->store_async(std::move(on_done));
 	}
 
-	void AssetHandle::load_async(std::function<void(AssetEntry&)> on_done)
+	void ResourceHandle::load_async(std::function<void(ResourceEntry&)> on_done)
 	{
 		if (entry_)
 			entry_->load_async(std::move(on_done));
 	}
 
-	std::string AssetHandle::get_name() const
+	std::string ResourceHandle::get_name() const
 	{
 		return entry_ ? entry_->get_name() : nullptr;
 	}
 
-	const HashedString& AssetHandle::get_id() const
+	const HashedString& ResourceHandle::get_id() const
 	{
 		return entry_ ? entry_->get_id() : HashedString::get_empty();
 	}
 
-	Asset* AssetHandle::get() const
+	Resource* ResourceHandle::get() const
 	{
 		return entry_ ? entry_->get() : nullptr;
 	}
 
-	BinaryInputStream& operator>>(BinaryInputStream& stream, AssetHandle& handle)
+	BinaryInputStream& operator>>(BinaryInputStream& stream, ResourceHandle& handle)
 	{
 		std::string id;
 		stream >> id;
@@ -78,7 +70,7 @@ namespace cp
 		return stream;
 	}
 
-	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const AssetHandle& handle)
+	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const ResourceHandle& handle)
 	{
 		const HashedString& id = handle.entry_ ? handle.entry_->get_id() : HashedString::get_empty();
 		stream << id;

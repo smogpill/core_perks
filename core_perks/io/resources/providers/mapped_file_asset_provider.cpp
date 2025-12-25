@@ -16,12 +16,12 @@ namespace cp
 	{
 	}
 
-	MappedAssetData MappedFileAssetProvider::map_asset(AssetEntry& entry)
+	MappedResourceData MappedFileAssetProvider::map_resource(ResourceEntry& entry)
 	{
-		return MappedAssetData(*this, entry, file_handle_.map());
+		return MappedResourceData(*this, entry, file_handle_.map());
 	}
 
-	void MappedFileAssetProvider::unmap_asset(MappedAssetData& data)
+	void MappedFileAssetProvider::unmap_asset(MappedResourceData& data)
 	{
 	}
 	*/

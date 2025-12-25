@@ -2,8 +2,13 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/io/assets/base/asset_base.h"
+#include "core_perks/io/resources/resource.h"
+#include "core_perks/io/resources/resource_manager.h"
+#include "resource_folder.h"
 
 namespace cp
 {
+	CP_DEFINE_CLASS(Resource)
+	{
+	}
 }
