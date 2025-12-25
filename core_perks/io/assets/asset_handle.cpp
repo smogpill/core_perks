@@ -10,7 +10,7 @@
 
 namespace cp
 {
-	AssetHandle::AssetHandle(const std::string& id, const Type& type)
+	AssetHandle::AssetHandle(const HashedString& id, const Type& type)
 		: entry_(AssetManager::get().get_or_create_entry(id, type))
 	{
 	}
@@ -20,7 +20,7 @@ namespace cp
 	{
 	}
 
-	void AssetHandle::set_id(const std::string& id, const Type& type)
+	void AssetHandle::set(const HashedString& id, const Type& type)
 	{
 		entry_ = AssetManager::get().get_or_create_entry(id, type);
 	}
@@ -28,13 +28,9 @@ namespace cp
 	void AssetHandle::set_resource(Asset* resource)
 	{
 		if (entry_)
-		{
 			entry_->set(resource);
-		}
 		else
-		{
 			delete resource;
-		}
 	}
 
 	void AssetHandle::unload_async()
@@ -43,13 +39,13 @@ namespace cp
 			entry_->unload_async();
 	}
 
-	void AssetHandle::store_async(std::function<void(bool)> on_done)
+	void AssetHandle::store_async(std::function<void(AssetEntry&)> on_done)
 	{
 		if (entry_)
 			entry_->store_async(std::move(on_done));
 	}
 
-	void AssetHandle::load_async(std::function<void(bool)> on_done)
+	void AssetHandle::load_async(std::function<void(AssetEntry&)> on_done)
 	{
 		if (entry_)
 			entry_->load_async(std::move(on_done));
@@ -60,10 +56,9 @@ namespace cp
 		return entry_ ? entry_->get_name() : nullptr;
 	}
 
-	const std::string& AssetHandle::get_id() const
+	const HashedString& AssetHandle::get_id() const
 	{
-		static const std::string empty_string;
-		return entry_ ? entry_->get_id() : empty_string;
+		return entry_ ? entry_->get_id() : HashedString::get_empty();
 	}
 
 	Asset* AssetHandle::get() const
@@ -79,14 +74,13 @@ namespace cp
 		stream >> type_hash;
 		const Type* type = Type::get_by_name_hash(type_hash);
 		if (type)
-			handle.set_id(id, *type);
+			handle.set(id, *type);
 		return stream;
 	}
 
 	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const AssetHandle& handle)
 	{
-		static const std::string empty_string;
-		const std::string& id = handle.entry_ ? handle.entry_->get_id() : empty_string;
+		const HashedString& id = handle.entry_ ? handle.entry_->get_id() : HashedString::get_empty();
 		stream << id;
 		const uint32 type_hash = handle.entry_ ? handle.entry_->get_type()->get_name_hash() : 0;
 		stream << type_hash;

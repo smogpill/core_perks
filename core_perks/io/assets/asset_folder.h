@@ -17,12 +17,13 @@ namespace cp
 	public:
 		AssetFolder(const std::string& path);
 		~AssetFolder() override;
+		MappedAssetData map_sub_asset(const AssetHandle& asset) override;
+		void unmap_sub_asset(const AssetHandle& asset) override;
 
 	protected:
 		bool on_load() override;
+		bool on_all_dependencies_loaded() override;
 		void on_unload() override;
-		MappedAssetData map_sub_asset(const AssetHandle& asset) override;
-		void unmap_sub_asset(const AssetHandle& asset) override;
 
 	private:
 		struct AssetInfo

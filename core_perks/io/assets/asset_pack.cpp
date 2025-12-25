@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 #include "pch.h"
 #include "core_perks/io/assets/asset_pack.h"
+#include "core_perks/io/assets/asset_manager.h"
 #include "core_perks/containers/vector_extensions.h"
 
 namespace cp
@@ -13,7 +14,7 @@ namespace cp
 
 	void operator>>(BinaryInputStream& stream, AssetPack::SubAssetInfo& entry)
 	{
-		stream >> entry.id_hash_;
+		stream >> entry.id_;
 		stream >> entry.offset_;
 		stream >> entry.size_;
 	}
@@ -50,12 +51,12 @@ namespace cp
 		// Do nothing
 	}
 
-	AssetPack::SubAssetInfo* AssetPack::get_sub_resource_info(const AssetHandle& asset) const
+	AssetPack::SubAssetInfo* AssetPack::get_sub_resource_info(const AssetHandle& asset)
 	{
-		const uint64 id_hash = asset->get_id_hash();
+		const HashedString& id = asset.get_id();
 		for (SubAssetInfo& info : sub_assets_)
 		{
-			if (info.id_hash_ == id_hash)
+			if (info.id_ == id)
 				return &info;
 		}
 		return nullptr;

@@ -7,32 +7,34 @@
 namespace cp
 {
 	class Asset; class AssetEntry; class BinaryInputStream; class BinaryOutputStream; 
-	class Type;
+	class Type; class HashedString;
 
 	class AssetHandle
 	{
 	public:
 		AssetHandle() = default;
 		explicit AssetHandle(AssetEntry* entry);
-		AssetHandle(const std::string& id, const Type& type);
+		AssetHandle(const HashedString& id, const Type& type);
 		~AssetHandle() = default;
 		//UntypedResourceHandle(const UntypedResourceHandle& other) : entry_(other.entry_) {}
 
 		void release() { entry_.release(); }
-		void load_async(std::function<void(bool)> on_done = [](bool) {});
-		void store_async(std::function<void(bool)> on_done = [](bool) {});
+		void load_async(std::function<void(AssetEntry&)> on_done = [](AssetEntry&) {});
+		void store_async(std::function<void(AssetEntry&)> on_done = [](AssetEntry&) {});
 		void unload_async();
 		std::string get_name() const;
-		const std::string& get_id() const;
+		const HashedString& get_id() const;
 		//auto operator=(const UntypedResourceHandle& other) { entry_ = other.entry_; }
 		operator bool() const { return entry_ != nullptr; }
 
 	protected:
+		friend class AssetManager;
 		friend BinaryInputStream& operator>>(BinaryInputStream& stream, AssetHandle& handle);
 		friend BinaryOutputStream& operator<<(BinaryOutputStream& stream, const AssetHandle& handle);
 
-		void set_id(const std::string& id, const Type& type);
-		void set_resource(Asset* resource);
+		void set(const HashedString& id, const Type& type);
+		template <class T>
+		void set(const HashedString& id) { set(id, T::get_type_static(); }
 		Asset* get() const;
 
 		cp::RefPtr<AssetEntry> entry_;
@@ -47,14 +49,14 @@ namespace cp
 		using Base::operator=;
 
 		TypedAssetHandle() = default;
-		TypedAssetHandle(const std::string& id) : Base(id, T::get_type_static()) {}
+		TypedAssetHandle(const HashedString& id) : Base(id, T::get_type_static()) {}
 		/*
 		ResourceHandle() = default;
-		ResourceHandle(const std::string& id);
+		ResourceHandle(const HashedString& id);
 		ResourceHandle(const ResourceHandle& other) : entry_(other.entry_) {}
 		*/
 
-		void set_id(const std::string& id) { Base::set_id(id, T::get_type_static()); }
+		void set(const HashedString& id) { Base::set(id, T::get_type_static()); }
 		//void ReloadAsync();
 		T* get() const { return static_cast<T*>(Base::get()); }
 		void set_resource(T* resource) { Base::set_resource(resource); }

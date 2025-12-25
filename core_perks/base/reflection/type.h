@@ -9,47 +9,6 @@ namespace cp
 
 	namespace detail
 	{
-		template <class T, bool>
-		struct TypeMove
-		{
-		};
-
-		template <class T>
-		struct TypeMove<T, true>
-		{
-			static void move(void* from, void* to) { *static_cast<T*>(to) = std::move(*static_cast<T*>(from)); }
-		};
-		template <class T>
-		struct TypeMove<T, false>
-		{
-			static void move(void* from, void* to) { CP_ASSERT(false); }
-		};
-
-		template <class T, bool>
-		struct TypeFactory
-		{
-		};
-
-		template <class T>
-		struct TypeFactory<T, true>
-		{
-			static void* create() { return new T(); }
-			static void* copy_create(const void* from) { return new T(*static_cast<const T*>(from)); }
-			static void construct(void* p) { CP_ASSERT(p); new (p) T(); }
-			static void copy_construct(void* p, const void* from) { CP_ASSERT(p); new (p) T(*static_cast<const T*>(from)); }
-			static void destruct(void* p) { CP_ASSERT(p); static_cast<T*>(p)->~T(); }
-		};
-
-		template <class T>
-		struct TypeFactory<T, false>
-		{
-			static void* create() { CP_ASSERT(false); return nullptr; }
-			static void* copy_create(const void*) { CP_ASSERT(false); return nullptr; }
-			static void construct(void* p) { CP_ASSERT(false); }
-			static void copy_construct(void* p, const void* from) { CP_ASSERT(false); }
-			static void destruct(void* p) { CP_ASSERT(false); }
-		};
-
 		template <class T, class = void>
 		struct TypeStatic
 		{
@@ -150,13 +109,30 @@ namespace cp
 		_size8 = sizeof(T);
 		_alignment8 = alignof(T);
 		_trivially_copyable = std::is_trivially_copyable<T>::value;
-		using type_factory = detail::TypeFactory<T, !std::is_abstract_v<T> && std::is_default_constructible_v<T>>;
-		_create = &type_factory::create;
-		_copy_create = &type_factory::copy_create;
-		_construct = &type_factory::construct;
-		_copy_construct = &type_factory::copy_construct;
-		_move = &detail::TypeMove<T, std::is_copy_assignable<T>::value>::move;
-		_destruct = &type_factory::destruct;
+		if constexpr (!std::is_abstract_v<T>)
+		{
+			if constexpr (std::is_default_constructible_v<T>)
+			{
+				_create = []() { return new T(); };
+				_construct = [](void* p) { CP_ASSERT(p); new (p) T(); };
+			}
+
+			if constexpr (std::is_copy_constructible_v<T>)
+			{
+				_copy_create = [](const void* from) { return new T(*static_cast<const T*>(from)); };
+				_copy_construct = [](void* p, const void* from) { CP_ASSERT(p); new (p) T(*static_cast<const T*>(from)); };
+			}
+
+			if constexpr (std::is_destructible_v<T>)
+			{
+				_destruct = [](void* p) { CP_ASSERT(p); static_cast<T*>(p)->~T(); };
+			}
+
+			if constexpr (std::is_move_assignable_v<T>)
+			{
+				_move = [](void* from, void* to) { *static_cast<T*>(to) = std::move(*static_cast<T*>(from)); };
+			}
+		}
 	}
 }
 

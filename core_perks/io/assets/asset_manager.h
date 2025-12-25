@@ -31,12 +31,12 @@ namespace cp
 		friend class Asset;
 		friend class AssetHandle;
 
-		AssetEntry* get_or_create_entry(const std::string& id, const Type& type);
+		AssetEntry* get_or_create_entry(const HashedString& id, const Type& type);
 		void destroy_entry(AssetEntry& entry);
 		void add_request(const AssetHandle& request);
 		void process_requests();
 		void on_entry_updated(AssetEntry& entry);
-		MappedAssetData map_asset(AssetEntry& entry);
+		MappedAssetData map_asset(const AssetHandle& asset);
 
 		mutable std::mutex mutex_;
 		std::unordered_map<uint64, AssetEntry*> map_;

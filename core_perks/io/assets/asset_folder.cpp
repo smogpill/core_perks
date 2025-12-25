@@ -26,6 +26,12 @@ namespace cp
 	{
 		CP_TRY(Base::on_load());
 		CP_TRY(std::filesystem::exists(path_), "Path does not exist: {}", path_.string());
+		return true;
+	}
+
+	bool AssetFolder::on_all_dependencies_loaded()
+	{
+		CP_TRY(Base::on_all_dependencies_loaded());
 		AssetManager::get().register_provider(*this);
 		return true;
 	}
@@ -60,7 +66,7 @@ namespace cp
 		info = new AssetInfo();
 		const std::filesystem::path asset_path = path_ / asset->get_asset_path();
 		info->file_.open(asset_path.string(), FileHandle::Mode::READ);
-		info->asset_id_hash_ = asset->get_id_hash();
+		info->asset_id_hash_ = asset->get_id().hash();
 		open_files_.push_back(info);
 		return *info;
 	}

@@ -47,7 +47,7 @@ namespace cp
         return _entry.path_exists();
     }
 
-    const std::string& AssetLoader::get_id() const
+    const HashedString& AssetLoader::get_id() const
     {
         return _entry.get_id();
     }

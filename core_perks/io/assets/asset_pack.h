@@ -5,6 +5,7 @@
 #include "core_perks/io/assets/asset.h"
 #include "core_perks/io/assets/asset_handle.h"
 #include "core_perks/io/assets/providers/asset_provider.h"
+#include "core_perks/patterns/hashed_string.h"
 
 namespace cp
 {
@@ -15,21 +16,22 @@ namespace cp
 	public:
 		struct SubAssetInfo
 		{
-			uint64 id_hash_ = 0;
+			HashedString id_;
 			uint64 offset_ = 0;
 			uint64 size_ = 0;
 		};
 
-		void build(const vector<AssetHandle>& resources);
+		virtual MappedAssetData map_sub_asset(const AssetHandle& asset) override;
+		virtual void unmap_sub_asset(const AssetHandle& asset) override;
+
+		void build(const std::vector<AssetHandle>& resources);
 
 	protected:
 		virtual bool on_load() override;
 		virtual void on_unload() override;
-		virtual MappedAssetData map_sub_asset(const AssetHandle& asset) override;
-		virtual void unmap_sub_asset(const AssetHandle& asset) override;
 
 	private:
-		SubAssetInfo* get_sub_resource_info(const AssetHandle& asset) const;
+		SubAssetInfo* get_sub_resource_info(const AssetHandle& asset);
 
 		std::vector<SubAssetInfo> sub_assets_;
 		//std::unorder_map<uint64, SubAssetInfo*> id_hash_to_sub_asset_;

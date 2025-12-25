@@ -4,7 +4,6 @@
 #include "pch.h"
 #include "core_perks/io/assets/asset_manager.h"
 #include "core_perks/io/assets/asset_loader.h"
-#include "core_perks/io/assets/asset_provider.h"
 #include "core_perks/io/assets/asset_entry.h"
 #include "core_perks/containers/vector_extensions.h"
 
@@ -29,7 +28,7 @@ namespace cp
 	void AssetManager::destroy_entry(AssetEntry& entry)
 	{
 		mutex_.lock();
-		auto it = map_.find(entry.get_id_hash());
+		auto it = map_.find(entry.get_id().hash());
 		map_.erase(it);
 		mutex_.unlock();
 	}
@@ -52,8 +51,8 @@ namespace cp
 				handle = requests_.back();
 				requests_.pop();
 			}
-			AssetEntry* entry = handle.entry_;
-			entry->update_async();
+			if (handle.entry_)
+				handle.entry_->update_async();
 		}
 	}
 
@@ -62,16 +61,16 @@ namespace cp
 		process_requests();
 	}
 
-	MappedAssetData AssetManager::map_asset(AssetEntry& entry)
+	MappedAssetData AssetManager::map_asset(const AssetHandle& asset)
 	{
 		std::scoped_lock lock(mutex_);
-		for (Asset* provider : providers_)
+		for (Asset* provider : providers_ | std::views::reverse)
 		{
-			MappedAssetData data = provider->map_asset(entry);
+			MappedAssetData data = provider->map_sub_asset(asset);
 			if (data.data() != nullptr)
 				return std::move(data);
 		}
-		return MappedAssetData();
+		return MappedAssetData(asset);
 	}
 
 	void AssetManager::register_provider(Asset& provider)
@@ -87,15 +86,14 @@ namespace cp
 		erase_first(providers_, &provider);
 	}
 
-	AssetEntry* AssetManager::get_or_create_entry(const std::string& id, const Type& type)
+	AssetEntry* AssetManager::get_or_create_entry(const HashedString& id, const Type& type)
 	{
-		const uint64 id_hash = hash::resource_id::hash64(id);
 		std::scoped_lock lock(mutex_);
-		auto it = map_.find(id_hash);
+		auto it = map_.find(id.hash());
 		if (it == map_.end())
 		{
-			AssetEntry* entry = new AssetEntry(id, id_hash, type);
-			map_[id_hash] = entry;
+			AssetEntry* entry = new AssetEntry(id, type);
+			map_[id.hash()] = entry;
 			return entry;
 		}
 		else

@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <span>
+#include <ranges>
 #include <vector>
 #include <deque>
 #include <queue>

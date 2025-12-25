@@ -6,7 +6,7 @@
 #include "core_perks/io/assets/asset_handle.h"
 #include "core_perks/io/assets/providers/mapped_asset_data.h"
 #include "core_perks/patterns/reference.h"
-#include "core_perks/patterns/string_id.h"
+#include "core_perks/patterns/hashed_string.h"
 
 namespace cp
 {
@@ -24,10 +24,10 @@ namespace cp
 		using Base = RefCounted;
 	public:
 		using Callback = std::function<void(AssetEntry&)>;
-		AssetEntry(const std::string& id, uint64 id_hash, const Type& type);
+		AssetEntry(const HashedString& id, const Type& type);
 		virtual ~AssetEntry();
 
-		const StringID& get_id() const { return id_; }
+		const HashedString& get_id() const { return id_; }
 		std::string get_name() const;
 		void add_loading_dependency();
 		void remove_loading_dependency();
@@ -59,7 +59,7 @@ namespace cp
 		void queue_async_callback(Callback&& callback);
 		Asset* create_resource();
 
-		StringID id_;
+		HashedString id_;
 		AssetPriority priority_;
 		const Type* type_ = nullptr;
 		RefPtr<AssetEntry> loading_parent_;

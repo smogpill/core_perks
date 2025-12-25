@@ -14,9 +14,8 @@
 
 namespace cp
 {
-    AssetEntry::AssetEntry(const std::string& id, uint64 id_hash, const Type& type)
+    AssetEntry::AssetEntry(const HashedString& id, const Type& type)
         : id_(id)
-        , id_hash_(id_hash)
         , type_(&type)
     {
     }
@@ -169,7 +168,7 @@ namespace cp
             callback(*this);
             remove_ref();
         };
-		cp::JobSystem::get().enqeue(job);
+		JobSystem::get().enqeue(job);
     }
 
     Asset* AssetEntry::create_resource()
@@ -215,7 +214,7 @@ namespace cp
         if (state_.compare_exchange_strong(expected, AssetState::LOADING))
         {
             add_ref();
-            cp::JobSystem::get().enqeue([this]()
+            JobSystem::get().enqeue([this]()
                 {
                     Resource* new_resource = type_->create<Resource>();
                     Resource* old_resource = loading_resource_.exchange(new_resource);
@@ -248,7 +247,7 @@ namespace cp
     {
         add_ref();
 
-        cp::JobSystem::get().enqeue([this, callback = std::move(on_done)]()
+        JobSystem::get().enqeue([this, callback = std::move(on_done)]()
             {
                 AssetState expected = AssetState::READY;
                 while (!state_.compare_exchange_weak(expected, AssetState::SERIALIZING))
@@ -334,7 +333,7 @@ namespace cp
         if (target_state != state_)
         {
             add_ref();
-            cp::JobSystem::get().enqeue([this]()
+            JobSystem::get().enqeue([this]()
                 {
                     on_update_async();
                     remove_ref();
