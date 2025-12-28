@@ -15,16 +15,18 @@ namespace cp
 		ResourceHandle() = default;
 		explicit ResourceHandle(ResourceEntry* entry);
 		ResourceHandle(const HashedString& id, const Type& type);
+		template <class T>
+		explicit ResourceHandle(const HashedString& id) : ResourceHandle(id, T::get_type_static()) {}
 		~ResourceHandle() = default;
 		//UntypedResourceHandle(const UntypedResourceHandle& other) : entry_(other.entry_) {}
 
-		void release() { entry_.release(); }
 		void load_async(std::function<void(ResourceEntry&)> on_done = [](ResourceEntry&) {});
 		void store_async(std::function<void(ResourceEntry&)> on_done = [](ResourceEntry&) {});
 		void unload_async();
+		void release() { entry_.release(); }
 		std::string get_name() const;
 		const HashedString& get_id() const;
-		//auto operator=(const UntypedResourceHandle& other) { entry_ = other.entry_; }
+		//auto operator=(const ResourceHandle& other) { entry_ = other.entry_; }
 		operator bool() const { return entry_ != nullptr; }
 
 	protected:
@@ -36,34 +38,7 @@ namespace cp
 		template <class T>
 		void set(const HashedString& id) { set(id, T::get_type_static()); }
 		Resource* get() const;
-
-		cp::RefPtr<ResourceEntry> entry_;
-	};
-
-	template <class T>
-	class TypedResourceHandle : public ResourceHandle
-	{
-		using Base = ResourceHandle;
-	public:
-		using Base::ResourceHandle;
-		using Base::operator=;
-
-		TypedResourceHandle() = default;
-		TypedResourceHandle(const HashedString& id) : Base(id, T::get_type_static()) {}
-		/*
-		ResourceHandle() = default;
-		ResourceHandle(const HashedString& id);
-		ResourceHandle(const ResourceHandle& other) : entry_(other.entry_) {}
-		*/
-
-		void set(const HashedString& id) { Base::set(id, T::get_type_static()); }
-		//void ReloadAsync();
-		T* get() const { return static_cast<T*>(Base::get()); }
-		void set_resource(T* resource) { Base::set_resource(resource); }
-		//auto operator=(const ResourceHandle& other) -> ResourceHandle& { entry_ = other.entry_; return *this; }
-
-	private:
-		friend class ResourceManager;
-		friend class ResourceLoader;
+		
+		RefPtr<ResourceEntry> entry_;
 	};
 }

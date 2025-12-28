@@ -6,6 +6,20 @@
 
 namespace cp::hash
 {
+	namespace fibonacci
+	{
+		CP_FORCE_INLINE uint32 hash32(uint64 val)
+		{ 
+			// M. E. O'Neill: "The PCG Paper" suggests better constants
+			return (val * 0x9E3779B97F4A7C15u) >> 32;
+		}
+	}
+
+	namespace mixed_fibonacci
+	{
+		CP_FORCE_INLINE uint32 hash32(uint64 val) { return ((val ^ (val >> 32)) * 11400714819323198485llu) >> 32; }
+	}
+
 	namespace crc32
 	{
 		CP_FORCE_INLINE uint32 hash32(uint32 x, uint32 seed = 0) { return _mm_crc32_u32(seed, x); }
@@ -13,7 +27,7 @@ namespace cp::hash
 		uint32 hash32(const void* data, uint64 length, uint32 seed = 0);
 		inline uint32 hash32(const std::string& str, uint32 seed = 0) { return hash32(str.data(), str.length(), seed); }
 	}
-	
+
 	namespace xxhash
 	{
 #ifdef CP_XXHASHCT
@@ -42,6 +56,11 @@ namespace cp::hash
 	CP_FORCE_INLINE uint64 strong64(const std::string& str, uint64 seed = 0) { return strong64(str.data(), str.length(), seed); }
 #endif
 */
+	namespace faster
+	{
+		using mixed_fibonacci::hash32;
+	}
+
 	namespace fast
 	{
 		using crc32::hash32;

@@ -6,7 +6,7 @@
 
 namespace cp
 {
-	void mark_memory_as_deleted(void* ptr_, size_t size)
+	void mark_memory_as_deleted(void* ptr_, uint64 size)
 	{
 		uint8* ptr = static_cast<uint8*>(ptr_);
 		while (size >= 8)
@@ -23,12 +23,7 @@ namespace cp
 		}
 	}
 
-	void* alloc(size_t size, AllocTag tag)
-	{
-		return aligned_alloc(alignof(std::max_align_t), size, tag);
-	}
-
-	void* aligned_alloc(size_t alignment, size_t size, AllocTag tag)
+	void* allocate(uint64 size, uint64 alignment, AllocTag tag)
 	{
 #ifdef CP_MSVC
 		// Visual Studio does not support C++17's std::aligned_alloc(): https://stackoverflow.com/questions/62962839/stdaligned-alloc-missing-from-visual-studio-2019c

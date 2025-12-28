@@ -22,27 +22,21 @@ namespace cp
 		CP_ASSERT(open_files_.empty());
 	}
 
-	bool ResourceFolder::on_load()
+	bool ResourceFolder::on_ready()
 	{
-		CP_TRY(Base::on_load());
+		CP_TRY(Base::on_ready());
 		CP_TRY(std::filesystem::exists(path_), "Path does not exist: {}", path_.string());
-		return true;
-	}
-
-	bool ResourceFolder::on_all_dependencies_loaded()
-	{
-		CP_TRY(Base::on_all_dependencies_loaded());
 		ResourceManager::get().register_provider(*this);
 		return true;
 	}
 
-	void ResourceFolder::on_unload()
+	void ResourceFolder::on_unready()
 	{
 		ResourceManager::get().unregister_provider(*this);
 		for (ResourceInfo* info : open_files_)
 			delete info;
 		open_files_.clear();
-		Base::on_unload();
+		Base::on_unready();
 	}
 
 	MappedResourceData ResourceFolder::map_sub_resource(const ResourceHandle& resource)

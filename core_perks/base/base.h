@@ -73,6 +73,8 @@ namespace cp
 
 #define CP_SAFE_SCOPE(_x_) do { _x_ } while (0)
 
+#define CP_AS_CONST(_member_) const_cast<std::remove_reference_t<decltype(*this)>*>(this)->_member_
+
 #include "core_perks/base/diagnostics.h"
 #include "core_perks/base/reflection/reflection.h"
 

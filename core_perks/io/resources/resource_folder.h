@@ -21,9 +21,8 @@ namespace cp
 		void unmap_sub_resource(const ResourceHandle& resource) override;
 
 	protected:
-		bool on_load() override;
-		bool on_all_dependencies_loaded() override;
-		void on_unload() override;
+		bool on_ready() override;
+		void on_unready() override;
 
 	private:
 		struct ResourceInfo

@@ -54,7 +54,7 @@ namespace cp
     void JobSystem::enqeue(Callable&& callable)
     {
         {
-            std::unique_lock lock(queue_mutex_);
+            std::scoped_lock lock(queue_mutex_);
             job_queue_.emplace_back(std::forward<Callable>(callable));
         }
         condition_.notify_one();
@@ -64,7 +64,7 @@ namespace cp
     void JobSystem::enqueue_blocking(Callable&& callable)
     {
         {
-            std::unique_lock lock(blocking_mutex_);
+            std::scoped_lock lock(blocking_mutex_);
             blocking_queue_.emplace_back(std::forward<Callable>(callable));
         }
         blocking_condition_.notify_one();
@@ -82,7 +82,7 @@ namespace cp
             void await_suspend(std::coroutine_handle<> h)
             {
                 // Wrap the coroutine task and continuation in a job
-                JobSystem::_singleton->enqeue([this, h]() mutable
+                JobSystem::get().enqeue([this, h]() mutable
                     {
                         task_.start(); // Execute the coroutine until it suspends or completes
                         if (task_.done())

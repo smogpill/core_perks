@@ -37,8 +37,8 @@ namespace cp
 		bool path_exists() const;
 		void unload_async();
 		void store_async(Callback callback);
-		Resource* get() const { return resource_; }
-		void set(Resource* resource);
+		RefPtr<Resource> get() const { return resource_; }
+		void set(const RefPtr<Resource>& resource);
 		std::string get_resource_path() const;
 		bool is_ready() const { return state_ == ResourceState::READY; }
 		void update_async();
@@ -69,7 +69,7 @@ namespace cp
 		std::vector<ResourceHandle*> load_requests_;
 		std::atomic<uint32> load_refs_ = 0;
 		std::vector<Callback> load_callbacks_;
-		std::atomic<Resource*> resource_ = nullptr;
+		RefPtr<Resource> resource_;
 		std::atomic<Resource*> loading_resource_ = nullptr;
 		bool loading_result_ = false;
 		bool locked_ = false;

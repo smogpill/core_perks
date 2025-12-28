@@ -4,3 +4,4 @@
 #pragma once
 #include "core_perks/containers/vector_extensions.h"
 #include "core_perks/containers/vector.h"
+#include "core_perks/containers/hash_map.h"
