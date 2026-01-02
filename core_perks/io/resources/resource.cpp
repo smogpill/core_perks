@@ -17,4 +17,12 @@ namespace cp
 		if (!contains(dependencies_, handle))
 			dependencies_.push_back(handle);
 	}
+
+	bool Resource::on_load()
+	{
+		MappedResourceData& data = get_mapped_data();
+		BinaryInputStream& stream = data.get_stream();
+		stream >> dependencies;
+		return true;
+	}
 }

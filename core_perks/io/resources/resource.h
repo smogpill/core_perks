@@ -30,7 +30,7 @@ namespace cp
 
 	protected:
 		MappedResourceData get_mapped_data();
-		virtual bool on_load() { return true; }
+		virtual bool on_load();
 		virtual void on_unload() {}
 		virtual bool on_dependency_loaded(ResourceEntry& dependency) { return true; }
 		virtual bool on_ready() { return true; }
