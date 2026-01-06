@@ -15,7 +15,7 @@ namespace cp
 	public:
 		~ResourceManager();
 	
-		ResourceHandle set_resource(const HashedString& id, const RefPtr<Resource>& resource);
+		ResourceHandle replace(const HashedString& id, const RefPtr<Resource>& resource);
 		ResourceHandle load_async(const HashedString& id, const Type& type, std::function<void(Resource&)> on_done = [](Resource&){});
 		template <class T>
 		ResourceHandle load_async(const HashedString& id, std::function<void(Resource&)> on_done = [](Resource&) {}) { return load_async(id, T::get_type_static(), on_done); }
@@ -32,20 +32,26 @@ namespace cp
 		void unregister_provider(Resource& resource);
 
 	private:
-		friend class ResourceEntry;
 		friend class Resource;
 		friend class ResourceHandle;
 
-		ResourceEntry* get_or_create_entry(const HashedString& id, const Type& type);
-		void destroy_entry(ResourceEntry& entry);
+		Resource* get_resource(const HashedString& id, const Type& type) const;
+		Resource* get_resource_no_lock(const HashedString& id, const Type& type) const;
+		void remove_resource(Resource& resource);
 		void add_request(const ResourceHandle& request);
 		void process_requests();
 		void on_entry_updated(ResourceEntry& entry);
 		MappedResourceData map_resource(const ResourceHandle& resource);
 
+		struct LoadRequest
+		{
+			ResourceHandle handle_;
+			std::function<void(Resource&)> on_done_;
+		};
+
 		mutable std::mutex mutex_;
 		std::unordered_map<uint64, Resource*> map_;
-		std::queue<ResourceHandle> requests_;
+		std::queue<LoadRequest> load_requests_;
 		std::string assets_path_;
 		std::string cache_path_;
 		std::vector<Resource*> providers_;

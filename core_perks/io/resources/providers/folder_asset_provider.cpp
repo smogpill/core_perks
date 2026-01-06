@@ -17,7 +17,7 @@ namespace cp
 		ResourceInfo& info = get_or_open_file(entry);
 		if (!info.file_.is_open())
 			return MappedResourceData();
-		MappedRegion region = info.file_.map(FileHandle::Access::READ_ONLY);
+		MappedFileRegion region = info.file_.map(FileHandle::Access::READ_ONLY);
 		return MappedResourceData(*this, entry, std::move(region));
 	}
 

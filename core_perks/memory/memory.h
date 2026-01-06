@@ -47,7 +47,7 @@ void* operator new(std::size_t size)
 
 void* operator new(std::size_t size, std::align_val_t alignment)
 {
-	return cp::allocate(size, alignment);
+	return cp::allocate(size, static_cast<uint64>(alignment));
 }
 
 void* operator new[](std::size_t size)
@@ -57,7 +57,7 @@ void* operator new[](std::size_t size)
 
 void* operator new[](std::size_t size, std::align_val_t alignment)
 {
-	return cp::allocate(size, alignment);
+	return cp::allocate(size, static_cast<uint64>(alignment));
 }
 
 void operator delete(void* ptr)

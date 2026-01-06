@@ -4,3 +4,4 @@
 #pragma once
 #include "core_perks/io/streams/binary_input_stream.h"
 #include "core_perks/io/streams/binary_output_stream.h"
+#include "core_perks/io/streams/binary_serializer.h"

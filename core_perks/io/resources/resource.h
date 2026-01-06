@@ -8,8 +8,8 @@
 namespace cp
 {
 	class BinaryOutputStream;
-	class ResourceLoader;
 	class MappedResourceData;
+	class BinarySerializer;
 
 	class Resource : public RefCounted
 	{
@@ -30,12 +30,14 @@ namespace cp
 
 	protected:
 		MappedResourceData get_mapped_data();
+		virtual void on_serialize(BinarySerializer& serializer) {}
+		//virtual void on_serialize_post_dependencies(BinarySerializer& serializer) {}
 		virtual bool on_load();
-		virtual void on_unload() {}
-		virtual bool on_dependency_loaded(ResourceEntry& dependency) { return true; }
+		virtual void on_unload();
+		virtual bool on_dependency_loaded(Resource& dependency) { return true; }
 		virtual bool on_ready() { return true; }
 		virtual void on_unready() {}
-		virtual void on_store(cp::BinaryOutputStream& stream) const {}
+		virtual void on_store(BinaryOutputStream& stream) const {}
 
 	private:
 		std::mutex mutex_;

@@ -11,7 +11,7 @@ namespace cp
 	{
 	}
 
-	MappedResourceData::MappedResourceData(const ResourceHandle& resource, const ResourceHandle& provider, MappedRegion&& region)
+	MappedResourceData::MappedResourceData(const ResourceHandle& resource, const ResourceHandle& provider, MappedFileRegion&& region)
 		: resource_(resource), provider_(provider), region_(std::move(region))
 	{
 	}

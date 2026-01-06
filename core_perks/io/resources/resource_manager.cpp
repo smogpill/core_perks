@@ -15,7 +15,14 @@ namespace cp
 		CP_ASSERT(map_.empty());
 	}
 
-	ResourceHandle ResourceManager::create(const HashedString& id, const Type& type)
+	ResourceHandle ResourceManager::load_async(const HashedString& id, const Type& type, std::function<void(Resource&)> on_done)
+	{
+		std::scoped_lock lock(mutex_);
+		Resource* resource = get_resource_no_lock(id, type);
+		return ResourceHandle();
+	}
+
+	ResourceHandle ResourceManager::replace(const HashedString& id, const RefPtr<Resource>& resource)
 	{
 		std::scoped_lock lock(mutex_);
 		CP_ASSERT(false);
@@ -32,12 +39,11 @@ namespace cp
 		cache_path_ = path;
 	}
 
-	void ResourceManager::destroy_entry(ResourceEntry& entry)
+	void ResourceManager::remove_resource(Resource& resource)
 	{
-		mutex_.lock();
-		auto it = map_.find(entry.get_id().hash());
+		std::scoped_lock lock(mutex_);
+		auto it = map_.find(resource.get_id().hash());
 		map_.erase(it);
-		mutex_.unlock();
 	}
 
 	void ResourceManager::add_request(const ResourceHandle& request)
@@ -93,19 +99,17 @@ namespace cp
 		erase_first(providers_, &provider);
 	}
 
-	ResourceEntry* ResourceManager::get_or_create_entry(const HashedString& id, const Type& type)
+	Resource* ResourceManager::get_resource_no_lock(const HashedString& id, const Type& type) const
+	{
+		auto it = map_.find(id.hash());
+		if (it != map_.end())
+			return it->second;
+		return nullptr;
+	}
+
+	Resource* ResourceManager::get_resource(const HashedString& id, const Type& type) const
 	{
 		std::scoped_lock lock(mutex_);
-		auto it = map_.find(id.hash());
-		if (it == map_.end())
-		{
-			ResourceEntry* entry = new ResourceEntry(id, type);
-			map_[id.hash()] = entry;
-			return entry;
-		}
-		else
-		{
-			return it->second;
-		}
+		return get_resource_no_lock(id, type);
 	}
 }

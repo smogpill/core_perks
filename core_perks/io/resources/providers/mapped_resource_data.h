@@ -14,7 +14,7 @@ namespace cp
 	{
 	public:
 		MappedResourceData(const ResourceHandle& resource);
-		MappedResourceData(const ResourceHandle& resource, const ResourceHandle& provider, MappedRegion&& region);
+		MappedResourceData(const ResourceHandle& resource, const ResourceHandle& provider, MappedFileRegion&& region);
 
 		bool mapped() const { return region_.is_mapped(); }
 		void* data() { return region_.data(); }
@@ -26,6 +26,6 @@ namespace cp
 	private:
 		ResourceHandle resource_;
 		ResourceHandle provider_;
-		MappedRegion region_;
+		MappedFileRegion region_;
 	};
 }

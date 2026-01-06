@@ -42,7 +42,7 @@ namespace cp
 		SubResourceInfo* info = get_sub_resource_info(resource);
 		if (info == nullptr)
 			return MappedResourceData(resource);
-		MappedRegion region = file_handle_.map_region(info->offset_, info->size_, FileHandle::Access::READ_ONLY);
+		MappedFileRegion region = file_handle_.map_region(info->offset_, info->size_, FileHandle::Access::READ_ONLY);
 		return MappedResourceData(resource, get_handle(), std::move(region));
 	}
 

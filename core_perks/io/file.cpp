@@ -6,7 +6,7 @@
 
 namespace cp
 {
-    MappedRegion::~MappedRegion()
+    MappedFileRegion::~MappedFileRegion()
     {
 #ifdef CP_WINDOWS
         if (view_)
@@ -102,14 +102,14 @@ namespace cp
 #endif
 	}
 
-    MappedRegion FileHandle::map(Access access)
+    MappedFileRegion FileHandle::map(Access access)
 	{
 		return map_region(0, get_size(), access);
 	}
 
-    MappedRegion FileHandle::map_region(uint64 offset, uint64 size, Access access)
+    MappedFileRegion FileHandle::map_region(uint64 offset, uint64 size, Access access)
 	{
-		MappedRegion region;
+		MappedFileRegion region;
 		if (!is_open())
 			return region;
 

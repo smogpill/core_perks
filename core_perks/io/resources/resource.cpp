@@ -22,7 +22,13 @@ namespace cp
 	{
 		MappedResourceData& data = get_mapped_data();
 		BinaryInputStream& stream = data.get_stream();
-		stream >> dependencies;
+		stream >> dependencies_;
 		return true;
+	}
+
+	void Resource::on_unload()
+	{
+		dependencies_.clear();
+		dependents_.clear();
 	}
 }
