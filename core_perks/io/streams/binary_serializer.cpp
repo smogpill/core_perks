@@ -8,7 +8,17 @@ namespace cp
 {
 	BinarySerializer::BinarySerializer(MappedFileRegion&& region, Mode mode)
 		: writing_(mode == Mode::WRITE)
-		, istream_(region.data(), region.size())
+		, input_stream_(region.data(), region.size())
+		, output_memory_view_(region.data(), region.size())
+		, output_stream_(output_memory_view_)
 	{
+	}
+
+	bool BinarySerializer::failed() const
+	{
+		if (writing_)
+			return output_stream_.failed();
+		else
+			return input_stream_.failed();
 	}
 }

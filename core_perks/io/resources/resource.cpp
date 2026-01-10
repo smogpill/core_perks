@@ -6,6 +6,7 @@
 #include "core_perks/io/resources/resource.h"
 #include "core_perks/io/resources/resource_manager.h"
 #include "core_perks/io/streams/binary_serializer.h"
+#include "core_perks/containers/vector_extensions.h"
 #include "resource_folder.h"
 
 namespace cp
@@ -23,6 +24,8 @@ namespace cp
 
 	void Resource::on_serialize(BinarySerializer& serializer)
 	{
+		serializer / dependencies_;
+		/*
 		if (serializer.writing_)
 		{
 			BinaryOutputStream& stream = serializer.ostream_;
@@ -55,6 +58,7 @@ namespace cp
 				}
 			}
 		}
+		*/
 	}
 
 	bool Resource::on_load()

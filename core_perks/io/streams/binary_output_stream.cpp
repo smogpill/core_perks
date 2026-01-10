@@ -42,11 +42,6 @@ namespace cp
 		capacity_ = size;
 	}
 
-	uint64 OutputMemoryView::size() const
-	{
-		return ptr_ - buffer_;
-	}
-
 	OutputMemoryBuffer::~OutputMemoryBuffer()
 	{
 		for (uint8* block : blocks_)

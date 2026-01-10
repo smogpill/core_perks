@@ -11,6 +11,7 @@ namespace cp
 	public:
 		void write(const void* buffer, uint64 size);
 		virtual uint64 size() const = 0;
+		virtual bool failed() const { return false; }
 
 	protected:
 		friend class BinaryOutputStream;
@@ -25,10 +26,15 @@ namespace cp
 	public:
 		OutputMemoryView(void* buffer, uint64 size);
 
-		uint64 size() const override;
+		uint64 size() const override { return ptr_ - buffer_; }
+		bool failed() const override { return failed_; }
+		
+	protected:
+		void grow(uint64 size) override { failed_ = true; }
 
 	private:
 		uint8* buffer_ = nullptr;
+		bool failed_ = false;
 	};
 
 	class OutputMemoryBuffer : public OutputMemory
@@ -56,6 +62,7 @@ namespace cp
 		template <class T> requires std::is_trivially_copyable_v<T>
 		void write(const T& value);
 		uint64 size() const { return memory_.size(); }
+		bool failed() const { return memory_.failed(); }
 
 	private:
 		OutputMemory& memory_;

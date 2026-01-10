@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
+#include "core_perks/patterns/reference.h"
 
 namespace cp
 {
@@ -15,8 +16,9 @@ namespace cp
 			READ_ONLY,
 			READ_WRITE
 		};
-		MappedFileRegion(FileHandle& file, Access access);
-		MappedFileRegion(FileHandle& file, Access access, uint64 offset, uint64 size);
+		MappedFileRegion() = default;
+		MappedFileRegion(const RefPtr<FileHandle>& file, Access access = Access::READ_ONLY);
+		MappedFileRegion(const RefPtr<FileHandle>& file, uint64 offset, uint64 size, Access access = Access::READ_ONLY);
 		~MappedFileRegion();
 
 		void* data() { return data_; }

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 #include "pch.h"
 #include "core_perks/io/resources/resource_manager.h"
-#include "core_perks/io/resources/resource_loader.h"
 #include "core_perks/io/resources/resource_entry.h"
+#include "core_perks/io/resources/providers/resource_provider.h"
 #include "core_perks/containers/vector_extensions.h"
 #include "core_perks/threading/job/job_system.h"
 
@@ -19,13 +19,13 @@ namespace cp
 	ResourceHandle ResourceManager::get_entry(const ResourceID& id) const
 	{
 		std::scoped_lock lock(mutex_);
-		return ResourceHandle(get_entry_no_lock(id.hash()));
+		return ResourceHandle(get_entry_no_lock(id));
 	}
 
-	ResourceHandle ResourceManager::get_or_create_entry(const ResourceID& id) const
+	ResourceHandle ResourceManager::get_or_create_entry(const ResourceID& id)
 	{
 		std::scoped_lock lock(mutex_);
-		ResourceEntry* entry = get_entry_no_lock(id.hash()));
+		ResourceEntry* entry = get_entry_no_lock(id);
 		if (!entry)
 		{
 			entry = new ResourceEntry(id);
@@ -73,9 +73,9 @@ namespace cp
 	MappedFileRegion ResourceManager::map_resource(const ResourceID& id)
 	{
 		std::scoped_lock lock(mutex_);
-		for (Resource* provider : providers_ | std::views::reverse)
+		for (ResourceProvider* provider : providers_ | std::views::reverse)
 		{
-			MappedFileRegion mapping = provider->map_sub_resource(id);
+			MappedFileRegion mapping = provider->map_resource(id);
 			if (mapping.data() != nullptr)
 				return std::move(mapping);
 		}

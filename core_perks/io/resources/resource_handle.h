@@ -6,23 +6,25 @@
 
 namespace cp
 {
-	class Resource; class BinaryInputStream; class BinaryOutputStream; class Type; class ResourceID;
+	class BinaryInputStream; class BinaryOutputStream; class Type; class ResourceID;
+	class ResourceEntry;
 
 	class ResourceHandle
 	{
 	public:
 		ResourceHandle() = default;
-		~ResourceHandle();
-
-		const ResourceID& get_id() const;
 		void release();
-		ResourceHandle& operator=(Resource* resource);
 		operator bool() const { return entry_ != nullptr; }
+		ResourceEntry* operator->() const { return entry_.get(); }
+		ResourceEntry& operator*() const { CP_ASSERT(entry_); return *entry_.get(); }
 
 	protected:
 		friend class ResourceManager;
+		friend class ResourceEntry;
 		friend BinaryInputStream& operator>>(BinaryInputStream& stream, ResourceHandle& handle);
 		friend BinaryOutputStream& operator<<(BinaryOutputStream& stream, const ResourceHandle& handle);
+
+		ResourceHandle(ResourceEntry* entry);
 
 		RefPtr<ResourceEntry> entry_;
 	};
@@ -33,7 +35,7 @@ namespace cp
 		CP_BASE(ResourceHandle);
 	public:
 		ResourceHandleT() = default;
-		T* get() const { return static_cast<T*>(resource_.get()); }
+		T* get() const { return static_cast<T*>(entry_.get()); }
 		using operator=;
 	};
 }

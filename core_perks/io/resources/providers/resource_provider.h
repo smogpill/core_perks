@@ -11,11 +11,9 @@ namespace cp
 	public:
 		virtual ~ResourceProvider() = default;
 
-		virtual MappedResourceData map_resource(const ResourceID& id) = 0 { return MappedResourceData(id); }
-		virtual void unmap_sub_resource(const ResourceHandle& resource) = 0 {}
-		virtual void store_sub_resource_async(const ResourceHandle& resource, std::function<void(bool)> on_done = [](bool) {}) = 0 { on_done(false); }
+		virtual MappedFileRegion map_resource(const ResourceID& id) = 0 { return MappedFileRegion(); }
+		virtual void store_resource_async(const ResourceHandle& resource, std::function<void(bool)> on_done = [](bool) {}) = 0 { on_done(false); }
 
 	protected:
-		void unmap_asset(MappedResourceData& data) = 0;
 	};
 }

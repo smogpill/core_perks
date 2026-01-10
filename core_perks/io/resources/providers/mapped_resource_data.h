@@ -5,6 +5,8 @@
 #include "core_perks/io/file/mapped_file_region.h"
 #include "core_perks/io/resources/resource_handle.h"
 
+#if 0
+
 namespace cp
 {
 	class Resource;
@@ -23,3 +25,5 @@ namespace cp
 		MappedFileRegion region_;
 	};
 }
+
+#endif

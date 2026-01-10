@@ -4,7 +4,10 @@
 #pragma once
 #include "core_perks/io/resources/resource.h"
 #include "core_perks/io/resources/resource_handle.h"
+#include "core_perks/io/file/file_handle.h"
 #include "core_perks/patterns/hashed_string.h"
+
+#if 0
 
 namespace cp
 {
@@ -20,20 +23,22 @@ namespace cp
 			uint64 size_ = 0;
 		};
 
-		virtual MappedResourceData map_sub_resource(const ResourceHandle& resource) override;
-		virtual void unmap_sub_resource(const ResourceHandle& resource) override;
+		virtual MappedFileRegion map_sub_resource(const ResourceID& id) override;
 
 		void build(const std::vector<ResourceHandle>& resources);
 
 	protected:
-		virtual bool on_load() override;
-		virtual void on_unload() override;
+		void on_serialize(BinarySerializer& serializer) override;
+		bool on_load() override;
+		void on_unload() override;
 
 	private:
 		SubResourceInfo* get_sub_resource_info(const ResourceHandle& resource);
 
 		std::vector<SubResourceInfo> sub_resources_;
 		//std::unorder_map<uint64, SubResourceInfo*> id_hash_to_sub_resource_;
-		FileHandle file_handle_;
+		RefPtr<FileHandle> file_handle_;
 	};
 }
+
+#endif

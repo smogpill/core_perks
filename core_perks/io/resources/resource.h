@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
+#include "core_perks/io/resources/base/resource_base.h"
 #include "core_perks/io/resources/providers/mapped_resource_data.h"
 #include "core_perks/patterns/hashed_string.h"
 #include "core_perks/patterns/reference.h"
@@ -20,12 +21,14 @@ namespace cp
 
 		const ResourceID& get_id() const;
 		bool is_ready() const { return state_ == ResourceState::READY; }
+
+		// Dependencies
 		void add_dependency(const ResourceHandle& handle);
+		const std::vector<ResourceHandle>& get_dependencies() const { return dependencies_; }
 
 		// Sub resources
 		virtual MappedFileRegion map_sub_resource(const ResourceID& id) = 0 { return MappedFileRegion(); }
-		virtual void unmap_sub_resource(const ResourceHandle& resource) = 0 {}
-		virtual store_sub_resource_async(const ResourceHandle& resource, std::function<void(bool)> on_done = [](bool) {}) = 0 { on_done(false); }
+		virtual void store_sub_resource_async(const ResourceHandle& resource, std::function<void(bool)> on_done = [](bool) {}) = 0 { on_done(false); }
 
 	protected:
 		MappedResourceData get_mapped_data();

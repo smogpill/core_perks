@@ -4,6 +4,8 @@
 #include "pch.h"
 #include "core_perks/io/resources/providers/mapped_resource_data.h"
 
+#if 0
+
 namespace cp
 {
 	MappedResourceData::MappedResourceData(const ResourceHandle& resource)
@@ -16,3 +18,5 @@ namespace cp
 	{
 	}
 }
+
+#endif

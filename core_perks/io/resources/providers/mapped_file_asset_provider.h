@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "core_perks/io/resources/providers/asset_provider.h"
-#include "core_perks/io/file.h"
+#include "core_perks/io/resources/providers/resource_provider.h"
+#include "core_perks/io/file/file_handle.h"
 
 #if 0
 namespace cp

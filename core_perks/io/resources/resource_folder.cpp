@@ -4,7 +4,9 @@
 #include "pch.h"
 #include "core_perks/io/resources/resource_folder.h"
 #include "core_perks/io/resources/resource_manager.h"
-#include "core_perks/io/file.h"
+#include "core_perks/io/file/file_handle.h"
+
+#if 0
 
 namespace cp
 {
@@ -76,3 +78,5 @@ namespace cp
 		return nullptr;
 	}
 }
+
+#endif

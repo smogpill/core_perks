@@ -40,42 +40,11 @@ namespace cp
 	void free(void* ptr);
 }
 
-void* operator new(std::size_t size)
-{
-	return cp::allocate(size);
-}
-
-void* operator new(std::size_t size, std::align_val_t alignment)
-{
-	return cp::allocate(size, static_cast<uint64>(alignment));
-}
-
-void* operator new[](std::size_t size)
-{
-	return cp::allocate(size);
-}
-
-void* operator new[](std::size_t size, std::align_val_t alignment)
-{
-	return cp::allocate(size, static_cast<uint64>(alignment));
-}
-
-void operator delete(void* ptr)
-{
-	cp::free(ptr);
-}
-
-void operator delete(void* ptr, std::align_val_t)
-{
-	cp::free(ptr);
-}
-
-void operator delete[](void* ptr)
-{
-	cp::free(ptr);
-}
-
-void operator delete[](void* ptr, std::align_val_t)
-{
-	cp::free(ptr);
-}
+void* operator new(std::size_t size);
+void* operator new(std::size_t size, std::align_val_t alignment);
+void* operator new[](std::size_t size);
+void* operator new[](std::size_t size, std::align_val_t alignment);
+void operator delete(void* ptr);
+void operator delete(void* ptr, std::align_val_t);
+void operator delete[](void* ptr);
+void operator delete[](void* ptr, std::align_val_t);

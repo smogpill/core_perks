@@ -8,22 +8,22 @@
 
 namespace cp
 {
-    MappedFileRegion::MappedFileRegion(FileHandle& file, Access access)
-        : MappedFileRegion(file, access, 0, 0)
+    MappedFileRegion::MappedFileRegion(const RefPtr<FileHandle>& file, Access access)
+        : MappedFileRegion(file, 0, 0, access)
     {
 
     }
 
-    MappedFileRegion::MappedFileRegion(FileHandle& file, Access access, uint64 offset, uint64 requested_size)
+    MappedFileRegion::MappedFileRegion(const RefPtr<FileHandle>& file, uint64 offset, uint64 requested_size, Access access)
         : file_(file)
     {
-        if (!file || !file->is_open())
+        if (!file_->is_open())
             return;
 
-        const uint64 file_size = file->get_size();
+        const uint64 file_size = file_->get_size();
         if (offset + requested_size > file_size)
         {
-            CP_ERROR("Can't map file region for file {}: region is not within bounds: [offset: {}, size: {}] while file size is {}", file->get_path(), offset, requested_size, file_size);
+            CP_ERROR("Can't map file region for file {}: region is not within bounds: [offset: {}, size: {}] while file size is {}", file_->get_path(), offset, requested_size, file_size);
             return;
         }
 
@@ -47,10 +47,10 @@ namespace cp
         DWORD size_low = static_cast<DWORD>(requested_size & 0xFFFFFFFF);
         DWORD size_high = static_cast<DWORD>((requested_size >> 32) & 0xFFFFFFFF);
 
-        mapping_ = CreateFileMappingW(file->get_native_handle(), nullptr, protect, size_high, size_low, nullptr);
+        mapping_ = CreateFileMappingW(file_->get_native_handle(), nullptr, protect, size_high, size_low, nullptr);
         if (!mapping_)
         {
-            CP_ERROR("Failed to map file: {}", file->get_path());
+            CP_ERROR("Failed to map file: {}", file_->get_path());
             return;
         }
 
@@ -62,7 +62,7 @@ namespace cp
         if (!data_)
         {
             DWORD err = GetLastError();
-            CP_ERROR("Failed to map view of file: {}", file->get_path());
+            CP_ERROR("Failed to map view of file: {}", file_->get_path());
             return;
         }
 

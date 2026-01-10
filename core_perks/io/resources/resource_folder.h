@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/io/resources/resource.h"
-#include "core_perks/io/file.h"
+#include "core_perks/io/file/file_handle.h"
+
+#if 0
 
 namespace cp
 {
@@ -40,3 +42,5 @@ namespace cp
 		std::vector<ResourceInfo*> open_files_;
 	};
 }
+
+#endif

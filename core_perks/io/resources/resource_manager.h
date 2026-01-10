@@ -18,20 +18,27 @@ namespace cp
 		~ResourceManager();
 	
 		ResourceHandle get_entry(const ResourceID& id) const;
-		ResourceHandle get_or_create_entry(const ResourceID& id) const;
+		ResourceHandle get_or_create_entry(const ResourceID& id);
 
 		void register_provider(ResourceProvider& provider);
 		void unregister_provider(ResourceProvider& provider);
 
 	private:
 		friend class Resource;
-		template <class T>
 		friend class ResourceHandle;
 		friend class ResourceEntry;
 
 		struct LoadRequest
 		{
 			ResourceHandle handle_;
+		};
+
+		struct Hash
+		{
+			std::size_t operator()(const ResourceID& id) const
+			{
+				return id.hash();
+			}
 		};
 
 		ResourceEntry* get_entry_no_lock(const ResourceID& id) const;
@@ -43,7 +50,7 @@ namespace cp
 		MappedFileRegion map_resource(const ResourceID& id);
 
 		mutable std::mutex mutex_;
-		std::unordered_map<const ResourceID&, ResourceEntry*> map_;
+		std::unordered_map<ResourceID, ResourceEntry*, Hash> map_;
 		std::queue<LoadRequest> load_requests_;
 		std::vector<ResourceProvider*> providers_;
 		uint max_parallel_updates_ = 4;

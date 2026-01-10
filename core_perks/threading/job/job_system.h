@@ -15,7 +15,7 @@ namespace cp
 
         /// Enqueue a regular function/lambda as a job
         template<typename Callable>
-        void enqeue(Callable&& callable);
+        void enqueue(Callable&& callable);
 
         /// Helper function to enqueue blocking jobs
         template<typename Callable>
@@ -30,7 +30,7 @@ namespace cp
         auto run_blocking_job(Callable&& callable);
 
         /// For the resource manager's dependency waiting
-        void resume_coroutine(std::coroutine_handle<> h) { enqeue([h]() { h.resume(); }); }
+        void resume_coroutine(std::coroutine_handle<> h) { enqueue([h]() { h.resume(); }); }
         void stop();
         bool is_running() const { return running_; }
 
@@ -51,7 +51,7 @@ namespace cp
     };
 
     template<typename Callable>
-    void JobSystem::enqeue(Callable&& callable)
+    void JobSystem::enqueue(Callable&& callable)
     {
         {
             std::scoped_lock lock(queue_mutex_);
@@ -82,7 +82,7 @@ namespace cp
             void await_suspend(std::coroutine_handle<> h)
             {
                 // Wrap the coroutine task and continuation in a job
-                JobSystem::get().enqeue([this, h]() mutable
+                JobSystem::get().enqueue([this, h]() mutable
                     {
                         task_.start(); // Execute the coroutine until it suspends or completes
                         if (task_.done())
@@ -115,7 +115,7 @@ namespace cp
                 JobSystem::get().enqueue_blocking([this, h]()
                     {
                         result_ = callable();
-                        JobSystem::get().enqeue([h]() { h.resume(); });
+                        JobSystem::get().enqueue([h]() { h.resume(); });
                     });
             }
             ResultType await_resume() { return std::move(result_); }
@@ -129,7 +129,7 @@ namespace cp
     struct ScheduleOnJobSystem
     {
         bool await_ready() const { return false; }
-        void await_suspend(std::coroutine_handle<> h) { JobSystem::get().enqeue([h]() { h.resume(); }); }
+        void await_suspend(std::coroutine_handle<> h) { JobSystem::get().enqueue([h]() { h.resume(); }); }
         void await_resume() const {}
     };
 }

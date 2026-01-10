@@ -6,6 +6,8 @@
 #include "core_perks/io/resources/resource_manager.h"
 #include "core_perks/containers/vector_extensions.h"
 
+#if 0
+
 namespace cp
 {
 	CP_DEFINE_CLASS(ResourcePack)
@@ -37,18 +39,12 @@ namespace cp
 		Base::on_unload();
 	}
 
-	MappedResourceData ResourcePack::map_sub_resource(const ResourceHandle& resource)
+	MappedFileRegion ResourcePack::map_sub_resource(const ResourceID& id)
 	{
 		SubResourceInfo* info = get_sub_resource_info(resource);
 		if (info == nullptr)
-			return MappedResourceData(resource);
-		MappedFileRegion region = file_handle_.map_region(info->offset_, info->size_, FileHandle::Access::READ_ONLY);
-		return MappedResourceData(resource, get_handle(), std::move(region));
-	}
-
-	void ResourcePack::unmap_sub_resource(const ResourceHandle& resource)
-	{
-		// Do nothing
+			return MappedFileRegion();
+		return MappedFileRegion(file_handle_, info->offset_, info->size_, FileHandle::Access::READ_ONLY);
 	}
 
 	ResourcePack::SubResourceInfo* ResourcePack::get_sub_resource_info(const ResourceHandle& resource)
@@ -62,3 +58,5 @@ namespace cp
 		return nullptr;
 	}
 }
+
+#endif

@@ -8,9 +8,12 @@
 
 namespace cp
 {
-	// Inspired by Media Molecule's "LBP" serialization method:
-	// https://handmade.network/p/29/swedish-cubes-for-unity/blog/p/2723-how_media_molecule_does_serialization
-
+	/// Handles:
+	/// - Write code once for both serialization and deserialization operations.
+	/// - Conditional operations such as versioning and removals of serialized values. 
+	/// 
+	/// Inspired by Media Molecule's "LBP" serialization method:
+	/// https://handmade.network/p/29/swedish-cubes-for-unity/blog/p/2723-how_media_molecule_does_serialization
 	class BinarySerializer
 	{
 	public:
@@ -20,12 +23,14 @@ namespace cp
 			WRITE
 		};
 		BinarySerializer(MappedFileRegion&& region, Mode mode = Mode::READ);
+		bool failed() const;
 		
 		uint32 version_ = 0;
-		MappedFileRegion file_region_;
 		bool writing_ = false;
-		BinaryInputStream istream_;
-		BinaryOutputStream ostream_;
+		MappedFileRegion file_region_;
+		BinaryInputStream input_stream_;
+		BinaryOutputStream output_stream_;
+		OutputMemoryView output_memory_view_;
 	};
 
 	template <class T>
@@ -37,7 +42,7 @@ namespace cp
 	};
 
 	template <class T>
-	CP_FORCE_INLINE Version<T> versioned(uint32 version, T& value) { return Versioned(version, value); }
+	CP_FORCE_INLINE Versioned<T> versioned(uint32 version, T& value) { return Versioned(version, value); }
 
 	template <class T>
 	struct Removed
@@ -56,9 +61,9 @@ namespace cp
 	BinarySerializer& operator/(BinarySerializer& serializer, T& value)
 	{
 		if (serializer.writing_)
-			serializer.ostream_ << value;
+			serializer.output_stream_ << value;
 		else
-			serializer.istream_ >> value;
+			serializer.input_stream_ >> value;
 		return serializer;
 	}
 

@@ -12,22 +12,9 @@ namespace cp
 	public:
 		FolderResourceProvider(const std::string& path);
 
-		MappedResourceData map_resource(ResourceEntry& entry) override;
-
-	protected:
-		void unmap_asset(MappedResourceData& data) override;
+		MappedFileRegion map_resource(const ResourceID& id) override;
 
 	private:
-		struct ResourceInfo
-		{
-			FileHandle file_;
-			uint64 resource_id_hash_ = 0;
-		};
-
-		ResourceInfo& get_or_open_file(const ResourceEntry& entry);
-		ResourceInfo* get_file(const ResourceEntry& entry) const;
-
 		std::filesystem::path folder_path_;
-		std::vector<ResourceInfo*> open_files_;
 	};
 }

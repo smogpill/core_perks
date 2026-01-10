@@ -44,7 +44,7 @@ namespace cp
 
 	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const HashedString& id)
 	{
-		stream << id.str();
+		stream << id.string();
 		return stream;
 	}
 }
