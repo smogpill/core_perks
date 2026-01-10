@@ -13,10 +13,14 @@ namespace cp
 	{
 	public:
 		ResourceHandle() = default;
+		ResourceHandle(const ResourceID& id, const Type& type);
+
+		void create();
+		void bind(const ResourceID& id, const Type& type);
+		const ResourceID& get_id() const;
+		const Type* get_type() const;
 		void release();
 		operator bool() const { return entry_ != nullptr; }
-		ResourceEntry* operator->() const { CP_ASSERT(entry_); return entry_.get(); }
-		ResourceEntry& operator*() const { CP_ASSERT(entry_); return *entry_.get(); }
 
 	protected:
 		friend class ResourceManager;
@@ -34,9 +38,19 @@ namespace cp
 	{
 		CP_BASE(ResourceHandle);
 	public:
-		using ResourceHandle::ResourceHandle;
+		ResourceHandleT() = default;
+		ResourceHandleT(const ResourceID& id) : Base(id, T::get_type_static()) {}
+		ResourceHandleT(const ResourceHandleT& handle) = default;
+		ResourceHandleT(const ResourceHandle& handle);
 		using ResourceHandle::operator=;
 
+		void bind(const ResourceID& id) { Base::set_entry(id, T::get_type_static()); }
 		T* get() const { return entry_ ? entry_->get<T>() : nullptr; }
 	};
+
+	template <class T>
+	ResourceHandleT<T>::ResourceHandleT(const ResourceHandle& handle)
+	{
+
+	}
 }

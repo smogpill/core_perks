@@ -18,7 +18,6 @@ namespace cp
 		~ResourceManager();
 	
 		ResourceHandle get_handle(const ResourceID& id) const;
-		ResourceHandle get_or_create_handle(const ResourceID& id);
 
 		void register_provider(ResourceProvider& provider);
 		void unregister_provider(ResourceProvider& provider);
@@ -41,6 +40,7 @@ namespace cp
 			}
 		};
 		
+		ResourceEntry* get_or_create_entry(const ResourceID& id, const Type& type);
 		ResourceEntry* get_entry_no_lock(const ResourceID& id) const;
 		void on_entry_destroyed(ResourceEntry& entry);
 		void remove_resource(Resource& resource);

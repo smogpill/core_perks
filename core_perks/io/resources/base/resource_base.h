@@ -37,6 +37,7 @@ namespace cp
 	public:
 		using HashedString::HashedString;
 		using HashedString::operator=;
-		using HashedString::get_empty;
+
+		static const ResourceID& get_empty();
 	};
 }

@@ -22,16 +22,25 @@ namespace cp
 		return ResourceHandle(get_entry_no_lock(id));
 	}
 
-	ResourceHandle ResourceManager::get_or_create_handle(const ResourceID& id)
+	ResourceEntry* ResourceManager::get_or_create_entry(const ResourceID& id, const Type& type)
 	{
 		std::scoped_lock lock(mutex_);
 		ResourceEntry* entry = get_entry_no_lock(id);
-		if (!entry)
+		if (entry)
 		{
-			entry = new ResourceEntry(id);
+			if (entry->get_type() != &type)
+			{
+				CP_ERROR("{}: Invalid requested type: {} instead of {}", id.string(), type.get_name(), entry->get_type().get_name());
+				entry = nullptr;
+			}
+		}
+		else
+		{
+			entry = new ResourceEntry(id, type);
 			map_[entry->get_id()] = entry;
 		}
-		return ResourceHandle(entry);
+		
+		return entry;
 	}
 
 	void ResourceManager::remove_resource(Resource& resource)

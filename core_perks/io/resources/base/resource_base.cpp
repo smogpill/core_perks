@@ -6,4 +6,9 @@
 
 namespace cp
 {
+	const ResourceID& ResourceID::get_empty()
+	{
+		static const ResourceID empty;
+		return empty;
+	}
 }

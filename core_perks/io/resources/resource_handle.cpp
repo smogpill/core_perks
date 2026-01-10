@@ -10,9 +10,30 @@
 
 namespace cp
 {
+	ResourceHandle::ResourceHandle(const ResourceID& id, const Type& type)
+	{
+		bind(id, type);
+	}
+
 	ResourceHandle::ResourceHandle(ResourceEntry* entry)
 		: entry_(entry)
 	{
+	}
+
+	void ResourceHandle::bind(const ResourceID& id, const Type& type)
+	{
+		entry_ = ResourceManager::get().get_or_create_entry(id, type);
+	}
+
+	void ResourceHandle::create()
+	{
+		CP_ASSERT(entry_);
+		entry_->create();
+	}
+
+	const ResourceID& ResourceHandle::get_id() const
+	{
+		return entry_ ? entry_->get_id() : ResourceID::get_empty();
 	}
 
 	void ResourceHandle::release()
@@ -24,13 +45,21 @@ namespace cp
 	{
 		ResourceID id;
 		stream >> id;
-		handle = ResourceManager::get().get_or_create_handle(id);
+		handle.bind(id);
 		return stream;
 	}
 
 	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const ResourceHandle& handle)
 	{
-		stream << (handle ? handle->get_id() : ResourceID::get_empty());
+		if (handle)
+		{
+			stream << handle.get_type();
+			stream << handle.get_id();
+		}
+		else
+		{
+			stream << (uint32)0;
+		}
 		return stream;
 	}
 }

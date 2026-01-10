@@ -16,7 +16,7 @@ namespace cp
 		ResourceEntry(const ResourceID& id);
 		~ResourceEntry();
 
-		void set(const RefPtr<Resource>& resource);
+		void create();
 		void load_async(std::function<void()>&& on_done = [](){});
 		template <class T = Resource>
 		RefPtr<T> get() const { return resource_; }
@@ -46,15 +46,5 @@ namespace cp
 		RefPtr<Resource> loading_resource_;
 		std::vector<std::function<void()>> loading_done_callbacks_;
 		std::atomic<uint32> waiting_dependencies_count_ = 0;
-	};
-
-	template <class T>
-	class ResourceEntryT : public ResourceEntry
-	{
-		CP_BASE(ResourceEntry);
-	public:
-		using ResourceEntry::ResourceEntry;
-
-		RefPtr<T> get() const { return Base::get<T>(); }
 	};
 }

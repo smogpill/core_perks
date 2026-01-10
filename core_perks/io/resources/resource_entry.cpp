@@ -10,8 +10,9 @@
 
 namespace cp
 {
-	ResourceEntry::ResourceEntry(const ResourceID& id)
+	ResourceEntry::ResourceEntry(const ResourceID& id, const Type& type)
 		: id_(id)
+		, type_(&type)
 	{
 	}
 
@@ -20,12 +21,11 @@ namespace cp
 		manager().on_entry_destroyed(*this);
 	}
 
-	void ResourceEntry::set(const RefPtr<Resource>& resource)
+	void ResourceEntry::create()
 	{
 		std::scoped_lock lock(mutex_);
-		resource_ = resource;
-		if (resource_)
-			resource_->entry_ = this;
+		resource_ = type_->create();
+		resource_->_entry = this;
 	}
 
 	void ResourceEntry::load_async(std::function<void()>&& on_done)
