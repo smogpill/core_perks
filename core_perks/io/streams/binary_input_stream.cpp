@@ -25,4 +25,10 @@ namespace cp
 			stream.read(str.data(), size);
 		return stream;
 	}
+
+	void BinaryInputStream::set_failed()
+	{
+		failed_ = true;
+		data_ = data_end_;
+	}
 }

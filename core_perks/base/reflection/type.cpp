@@ -11,16 +11,16 @@ namespace cp
 {
 	Type::Type(const char* name)
 		: _name(name)
-		, _name_hash(hash::fast::hash32(_name))
+		, _id(hash::fast::hash32(_name))
 	{
 		get_types().push_back(this);
-		CP_ASSERT(get_name_hash_to_type_map().find(_name_hash) == get_name_hash_to_type_map().end());
-		get_name_hash_to_type_map()[_name_hash] = this;
+		CP_ASSERT(get_id_to_type_map().find(_id) == get_id_to_type_map().end());
+		get_id_to_type_map()[_id] = this;
 	}
 
 	Type::~Type()
 	{
-		get_name_hash_to_type_map().erase(_name_hash);
+		get_id_to_type_map().erase(_id);
 		swap_and_pop_first(get_types(), this);
 	}
 
@@ -39,10 +39,10 @@ namespace cp
 			_init(*type);
 	}
 
-	Type* Type::get_by_name_hash(uint32 name_hash)
+	Type* Type::get_by_id(uint32 id)
 	{
-		const auto& map = get_name_hash_to_type_map();
-		auto it = map.find(name_hash);
+		const auto& map = get_id_to_type_map();
+		auto it = map.find(id);
 		if (it != map.end())
 			return it->second;
 		return nullptr;
@@ -75,7 +75,7 @@ namespace cp
 		return types;
 	}
 
-	std::unordered_map<uint32, Type*>& Type::get_name_hash_to_type_map()
+	std::unordered_map<uint32, Type*>& Type::get_id_to_type_map()
 	{
 		static std::unordered_map<uint32, Type*> map;
 		return map;

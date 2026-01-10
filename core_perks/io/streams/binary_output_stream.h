@@ -2,24 +2,63 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
+#include "core_perks/memory/memory.h"
 
 namespace cp
 {
+	class OutputMemory
+	{
+	public:
+		void write(const void* buffer, uint64 size);
+		virtual uint64 size() const = 0;
+
+	protected:
+		friend class BinaryOutputStream;
+		virtual void grow(uint64 size) = 0;
+
+		uint8* ptr_ = nullptr;
+		uint64 capacity_ = 0;
+	};
+
+	class OutputMemoryView : public OutputMemory
+	{
+	public:
+		OutputMemoryView(void* buffer, uint64 size);
+
+		uint64 size() const override;
+
+	private:
+		uint8* buffer_ = nullptr;
+	};
+
+	class OutputMemoryBuffer : public OutputMemory
+	{
+	public:
+		~OutputMemoryBuffer();
+
+		void copy_to_buffer(void* dest_buffer);
+		uint64 size() const override;
+
+	protected:
+		void grow(uint64 size) override;
+
+	private:
+		static constexpr uint32 block_size = 16 * page_size;
+		std::vector<uint8*> blocks_;
+	};
+
 	class BinaryOutputStream
 	{
 	public:
-		BinaryOutputStream();
+		BinaryOutputStream(OutputMemory& memory);
 		~BinaryOutputStream();
 		void write(const void* buffer, uint64 size);
 		template <class T> requires std::is_trivially_copyable_v<T>
 		void write(const T& value);
-		uint64 size() const;
-		void copy_to_buffer(void* dest_buffer);
+		uint64 size() const { return memory_.size(); }
 
 	private:
-		static constexpr uint32 block_size = 64 * 1024;
-		std::vector<uint8*> blocks_;
-		uint32 current_block_pos_ = 0;
+		OutputMemory& memory_;
 	};
 
 	template <class T> requires std::is_trivially_copyable_v<T>

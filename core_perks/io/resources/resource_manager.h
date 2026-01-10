@@ -10,41 +10,42 @@
 
 namespace cp
 {
+	class ResourceProvider;
+
 	class ResourceManager : public Singleton<ResourceManager>
 	{
 	public:
 		~ResourceManager();
 	
-		ResourceHandle set(const HashedString& id, const cp::RefPtr<Resource>& resource);
-		ResourceHandle load_async(const HashedString& id, const Type& type, std::function<void(Resource&)> on_done = [](Resource&){});
-		template <class T>
-		ResourceHandle load_async(const HashedString& id, std::function<void(Resource&)> on_done = [](Resource&) {}) { return load_async(id, T::get_type_static(), on_done); }
+		ResourceHandle get_entry(const ResourceID& id) const;
+		ResourceHandle get_or_create_entry(const ResourceID& id) const;
 
-		void register_provider(Resource& resource);
-		void unregister_provider(Resource& resource);
+		void register_provider(ResourceProvider& provider);
+		void unregister_provider(ResourceProvider& provider);
 
 	private:
 		friend class Resource;
+		template <class T>
 		friend class ResourceHandle;
-
-		Resource* get_resource(const HashedString& id, const Type& type) const;
-		Resource* get_resource_no_lock(const HashedString& id, const Type& type) const;
-		void remove_resource(Resource& resource);
-		void add_request(const ResourceHandle& request);
-		void process_requests();
-		void on_resource_updated(Resource& resource);
-		MappedResourceData map_resource(const ResourceHandle& resource);
+		friend class ResourceEntry;
 
 		struct LoadRequest
 		{
 			ResourceHandle handle_;
-			std::function<void(Resource&)> on_done_;
 		};
 
+		ResourceEntry* get_entry_no_lock(const ResourceID& id) const;
+		void on_entry_destroyed(ResourceEntry& entry);
+		void remove_resource(Resource& resource);
+		void push_load_request(LoadRequest&& request);
+		void process_requests();
+		void on_resource_updated(Resource& resource);
+		MappedFileRegion map_resource(const ResourceID& id);
+
 		mutable std::mutex mutex_;
-		std::unordered_map<uint64, Resource*> map_;
+		std::unordered_map<const ResourceID&, ResourceEntry*> map_;
 		std::queue<LoadRequest> load_requests_;
-		std::vector<Resource*> providers_;
+		std::vector<ResourceProvider*> providers_;
 		uint max_parallel_updates_ = 4;
 
 		/*

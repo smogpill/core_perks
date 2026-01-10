@@ -6,40 +6,34 @@
 
 namespace cp
 {
-	class Resource; class BinaryInputStream; class BinaryOutputStream;
-	class Type; class HashedString;
+	class Resource; class BinaryInputStream; class BinaryOutputStream; class Type; class ResourceID;
 
-	class ResourceHandleBase
+	class ResourceHandle
 	{
 	public:
-		ResourceHandleBase() = default;
-		ResourceHandleBase(Resource* resource);
-		~ResourceHandleBase() = default;
+		ResourceHandle() = default;
+		~ResourceHandle();
 
-		void release() { resource_.release(); }
-		ResourceHandleBase& operator=(Resource* resource) { resource_ = resource; }
-		//auto operator=(const ResourceHandle& other) { entry_ = other.entry_; }
-		operator bool() const { return resource_ != nullptr; }
+		const ResourceID& get_id() const;
+		void release();
+		ResourceHandle& operator=(Resource* resource);
+		operator bool() const { return entry_ != nullptr; }
 
 	protected:
 		friend class ResourceManager;
 		friend BinaryInputStream& operator>>(BinaryInputStream& stream, ResourceHandle& handle);
 		friend BinaryOutputStream& operator<<(BinaryOutputStream& stream, const ResourceHandle& handle);
 
-		RefPtr<Resource> resource_;
+		RefPtr<ResourceEntry> entry_;
 	};
 
-	template <class T = Resource>
-	class ResourceHandle : public ResourceHandleBase
+	template <class T>
+	class ResourceHandleT : public ResourceHandle
 	{
-		CP_BASE(ResourceHandleBase);
+		CP_BASE(ResourceHandle);
 	public:
-		ResourceHandle() = default;
-		T* get() const;
+		ResourceHandleT() = default;
+		T* get() const { return static_cast<T*>(resource_.get()); }
 		using operator=;
-
-	private:
-		friend class ResourceManager;
-		explicit ResourceHandle(Resource* resource) { resource_ = resource; }
 	};
 }

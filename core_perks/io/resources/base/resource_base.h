@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/math/numerical/hash.h"
+#include "core_perks/patterns/hashed_string.h"
 
 namespace cp
 {
@@ -14,10 +15,12 @@ namespace cp
 		FAILED,
 
 		// Transitions
-		LOADING_DEPENDENCIES,
-		LOADING_SELF,
+		LOADING,
+		WAITING_DEPENDENCIES,
+		LOADING_POST_DEPENDENCIES,
 		PROCESSING,
-		STORING
+		STORING,
+		UNLOADING
 	};
 
 	union ResourcePriority
@@ -29,12 +32,11 @@ namespace cp
 		} bits_;
 	};
 
-	namespace hash
+	class ResourceID : public HashedString
 	{
-		namespace resource_id
-		{
-			using strong::hash64;
-			using strong::hash64_compile_time;
-		}
-	}
+	public:
+		using HashedString::HashedString;
+		using HashedString::operator=;
+		using HashedString::get_empty;
+	};
 }

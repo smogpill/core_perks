@@ -3,13 +3,12 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/io/resources/providers/mapped_resource_data.h"
+#include "core_perks/patterns/hashed_string.h"
 #include "core_perks/patterns/reference.h"
 
 namespace cp
 {
-	class BinaryOutputStream;
-	class MappedResourceData;
-	class BinarySerializer;
+	class BinaryOutputStream; class MappedResourceData; class BinarySerializer; class ResourceID;
 
 	class Resource : public RefCounted
 	{
@@ -19,34 +18,35 @@ namespace cp
 	public:
 		virtual ~Resource() = default;
 
-		const HashedString& get_id() const;
+		const ResourceID& get_id() const;
 		bool is_ready() const { return state_ == ResourceState::READY; }
 		void add_dependency(const ResourceHandle& handle);
 
 		// Sub resources
-		virtual MappedResourceData map_sub_resource(const ResourceHandle& resource) = 0 { return MappedResourceData(resource); }
+		virtual MappedFileRegion map_sub_resource(const ResourceID& id) = 0 { return MappedFileRegion(); }
 		virtual void unmap_sub_resource(const ResourceHandle& resource) = 0 {}
 		virtual store_sub_resource_async(const ResourceHandle& resource, std::function<void(bool)> on_done = [](bool) {}) = 0 { on_done(false); }
 
 	protected:
 		MappedResourceData get_mapped_data();
-		virtual void on_serialize(BinarySerializer& serializer) {}
+		virtual void on_serialize(BinarySerializer& serializer);
 		//virtual void on_serialize_post_dependencies(BinarySerializer& serializer) {}
 		virtual bool on_load();
 		virtual void on_unload();
 		virtual bool on_dependency_loaded(Resource& dependency) { return true; }
 		virtual bool on_ready() { return true; }
 		virtual void on_unready() {}
-		virtual void on_store(BinaryOutputStream& stream) const {}
 
 	private:
 		friend class ResourceManager;
+		friend class ResourceEntry;
 
 		std::mutex mutex_;
-		HashedString id_;
+		ResourceEntry* entry_ = nullptr;
 		uint32 version_ = 0;
 		ResourceState state_ = ResourceState::NONE;
 		std::vector<ResourceHandle> dependencies_;
 		std::vector<Resource*> dependents_;
+		std::vector<ResourceHandle*> users_;
 	};
 }

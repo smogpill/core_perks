@@ -6,5 +6,9 @@
 
 namespace cp
 {
-
+	BinarySerializer::BinarySerializer(MappedFileRegion&& region, Mode mode)
+		: writing_(mode == Mode::WRITE)
+		, istream_(region.data(), region.size())
+	{
+	}
 }

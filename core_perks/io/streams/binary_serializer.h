@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "core_perks/io/file.h"
+#include "core_perks/io/file/mapped_file_region.h"
 #include "core_perks/io/streams/binary_input_stream.h"
 #include "core_perks/io/streams/binary_output_stream.h"
 
@@ -14,14 +14,18 @@ namespace cp
 	class BinarySerializer
 	{
 	public:
+		enum Mode
+		{
+			READ,
+			WRITE
+		};
+		BinarySerializer(MappedFileRegion&& region, Mode mode = Mode::READ);
+		
 		uint32 version_ = 0;
 		MappedFileRegion file_region_;
 		bool writing_ = false;
-		union
-		{
-			BinaryInputStream istream_;
-			BinaryOutputStream ostream_;
-		};
+		BinaryInputStream istream_;
+		BinaryOutputStream ostream_;
 	};
 
 	template <class T>

@@ -2,17 +2,17 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #include "pch.h"
-#include "core_perks/io/resources/providers/folder_asset_provider.h"
+#include "core_perks/io/resources/providers/folder_resource_provider.h"
+#include "core_perks/io/file/mapped_file_region.h"
 
-#if 0
 namespace cp
 {
-	FolderAssetProvider::FolderAssetProvider(const std::string& path)
+	FolderResourceProvider::FolderResourceProvider(const std::string& path)
 		: folder_path_(path)
 	{
 	}
 
-	MappedResourceData FolderAssetProvider::map_resource(ResourceEntry& entry)
+	MappedResourceData FolderResourceProvider::map_resource(ResourceEntry& entry)
 	{
 		ResourceInfo& info = get_or_open_file(entry);
 		if (!info.file_.is_open())
@@ -21,12 +21,12 @@ namespace cp
 		return MappedResourceData(*this, entry, std::move(region));
 	}
 
-	void FolderAssetProvider::unmap_asset(MappedResourceData& data)
+	void FolderResourceProvider::unmap_asset(MappedResourceData& data)
 	{
 		//ResourceInfo* info = get_file(data);
 	}
 
-	ResourceInfo& FolderAssetProvider::get_or_open_file(const ResourceEntry& entry)
+	ResourceInfo& FolderResourceProvider::get_or_open_file(const ResourceEntry& entry)
 	{
 		ResourceInfo* info = get_file(entry);
 		if (info)
@@ -39,7 +39,7 @@ namespace cp
 		return *new_info;
 	}
 
-	ResourceInfo* FolderAssetProvider::get_file(const ResourceEntry& entry) const
+	ResourceInfo* FolderResourceProvider::get_file(const ResourceEntry& entry) const
 	{
 		for (ResourceInfo* info : open_files_)
 		{
@@ -49,4 +49,3 @@ namespace cp
 		return nullptr;
 	}
 }
-#endif

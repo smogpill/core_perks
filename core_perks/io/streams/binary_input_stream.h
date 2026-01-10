@@ -14,6 +14,7 @@ namespace cp
 		void read(void* buffer, uint64 size);
 		template <class T> requires std::is_trivially_copyable_v<T>
 		void read(T& value);
+		void set_failed();
 
 	private:
 		const uint8* data_ = nullptr;
@@ -32,7 +33,7 @@ namespace cp
 		}
 		else
 		{
-			failed_ = true;
+			set_failed();
 		}
 	}
 

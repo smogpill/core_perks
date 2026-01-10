@@ -6,45 +6,69 @@
 
 namespace cp
 {
-	BinaryOutputStream::BinaryOutputStream()
+	void OutputMemory::write(const void* buffer, uint64 size)
 	{
-		blocks_.push_back(new uint8[block_size]);
+		const uint8* src = static_cast<const uint8*>(buffer);
+		while (size > 0) [[likely]]
+		{
+			if (size <= capacity_) [[likely]]
+			{
+				std::memcpy(ptr_, src, size);
+				ptr_ += size;
+				capacity_ -= size;
+				return;
+			}
+			else if (capacity_)
+			{
+				std::memcpy(ptr_, src, capacity_);
+				src += capacity_;
+				ptr_ += capacity_;
+				size -= capacity_;
+				grow(size);
+			}
+			else
+			{
+				grow(size);
+				if (!capacity_)
+					return;
+			}
+		}
 	}
 
-	BinaryOutputStream::~BinaryOutputStream()
+	OutputMemoryView::OutputMemoryView(void* buffer, uint64 size)
+		: buffer_(static_cast<uint8*>(buffer))
+	{
+		ptr_ = buffer_;
+		capacity_ = size;
+	}
+
+	uint64 OutputMemoryView::size() const
+	{
+		return ptr_ - buffer_;
+	}
+
+	OutputMemoryBuffer::~OutputMemoryBuffer()
 	{
 		for (uint8* block : blocks_)
 			delete[] block;
 	}
 
-	void BinaryOutputStream::write(const void* buffer, uint64 size)
+	void OutputMemoryBuffer::grow(uint64 size)
 	{
-		const uint8* src = static_cast<const uint8*>(buffer);
-		while (size > 0) [[likely]]
-		{
-			if (current_block_pos_ == block_size) [[unlikely]]
-			{
-				blocks_.push_back(new uint8[block_size]);
-				current_block_pos_ = 0;
-			}
-			const uint64 available = block_size - current_block_pos_;
-			const uint64 to_write = size <= available ? size : available;
-			std::memcpy(blocks_.back() + current_block_pos_, src, to_write);
-			src += to_write;
-			current_block_pos_ += static_cast<uint32>(to_write);
-			size -= to_write;
-		}
+		blocks_.push_back(new uint8[block_size]);
+		ptr_ = blocks_.back();
+		capacity_ = block_size;
 	}
 
-	uint64 BinaryOutputStream::size() const
+	uint64 OutputMemoryBuffer::size() const
+	{
+		return blocks_.size() * block_size - capacity_;
+	}
+
+	void OutputMemoryBuffer::copy_to_buffer(void* dest_buffer)
 	{
 		if (blocks_.empty())
-			return 0;
-		return static_cast<uint64>(blocks_.size() - 1) * block_size + current_block_pos_;
-	}
-
-	void BinaryOutputStream::copy_to_buffer(void* dest_buffer)
-	{
+			return;
 		uint8* dest = static_cast<uint8*>(dest_buffer);
 		const uint block_count_minus_one = (uint)blocks_.size() - 1;
 		for (uint block_idx = 0; block_idx < block_count_minus_one; ++block_idx)
@@ -53,8 +77,8 @@ namespace cp
 			std::memcpy(dest, block, block_size);
 		}
 
-		if (current_block_pos_)
-			std::memcpy(dest, blocks_.back(), current_block_pos_);
+		const uint64 pos_in_block = block_size - capacity_;
+		std::memcpy(dest, blocks_.back(), pos_in_block);
 	}
 
 	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const std::string& str)

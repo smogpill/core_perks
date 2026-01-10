@@ -2,16 +2,15 @@
 // SPDX-FileCopyrightText: 2025 Jounayd ID SALAH
 // SPDX-License-Identifier: MIT
 #pragma once
-#include "core_perks/io/resources/providers/asset_provider.h"
-#include "core_perks/io/file.h"
+#include "core_perks/io/resources/providers/resource_provider.h"
+#include "core_perks/io/file/file_handle.h"
 
-#if 0
 namespace cp
 {
-	class FolderAssetProvider : public AssetProvider
+	class FolderResourceProvider : public ResourceProvider
 	{
 	public:
-		FolderAssetProvider(const std::string& path);
+		FolderResourceProvider(const std::string& path);
 
 		MappedResourceData map_resource(ResourceEntry& entry) override;
 
@@ -32,4 +31,3 @@ namespace cp
 		std::vector<ResourceInfo*> open_files_;
 	};
 }
-#endif

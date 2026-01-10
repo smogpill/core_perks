@@ -59,19 +59,24 @@ namespace cp
 		Type(const char* name);
 		virtual ~Type();
 
+		template <class T>
+		static Type* get() { return detail::TypeStatic<T>::get_type_static(); }
+		static Type* get_by_id(uint32 id);
+		const std::string& get_name() const { return _name; }
+		void set_id(uint32 id) { _id = id; }
+		uint32 get_id() const { return _id; }
+
+		// Derivation
+		bool is_a(const Type& type) const;
+		std::vector<Type*> get_derived() const;
+
+		// Factory
 		template <class T = void>
 		auto create() const -> T* { return static_cast<T*>(_create()); }
 		auto copy_create(const void* from) const -> void* { return _copy_create(from); }
 		void construct(void* ptr) const { _construct(ptr); }
 		void copy_construct(void* ptr, const void* from) const { _copy_construct(ptr, from); }
 		void destruct(void* ptr) const { _destruct(ptr); }
-		template <class T>
-		static Type* get() { return detail::TypeStatic<T>::get_type_static(); }
-		static Type* get_by_name_hash(uint32 name_hash);
-		const std::string& get_name() const { return _name; }
-		uint32 get_name_hash() const { return _name_hash; }
-		bool is_a(const Type& type) const;
-		std::vector<Type*> get_derived() const;
 
 		template <class T>
 		void _init_generics();
@@ -83,7 +88,7 @@ namespace cp
 		void init(Type* type = nullptr);
 
 		Type* _base = nullptr;
-		uint32 _name_hash = 0;
+		uint32 _id = 0;
 		uint32 _size8 = 0;
 		uint16 _alignment8 = 0;
 		bool _initialized : 1 = false;
@@ -98,7 +103,7 @@ namespace cp
 		std::string _name;
 
 		static std::vector<Type*>& get_types();
-		static std::unordered_map<uint32, Type*>& get_name_hash_to_type_map();
+		static std::unordered_map<uint32, Type*>& get_id_to_type_map();
 	};
 
 	template <class T>
