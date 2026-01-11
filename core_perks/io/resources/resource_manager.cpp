@@ -52,8 +52,11 @@ namespace cp
 
 	void ResourceManager::push_load_request(LoadRequest&& request)
 	{
-		std::scoped_lock lock(mutex_);
-		load_requests_.emplace(std::move(request));
+		{
+			std::scoped_lock lock(mutex_);
+			load_requests_.emplace(std::move(request));
+		}
+		process_requests();
 	}
 
 	void ResourceManager::process_requests()
@@ -79,16 +82,18 @@ namespace cp
 		process_requests();
 	}
 
-	MappedFileRegion ResourceManager::map_resource(const ResourceID& id)
+	std::unique_ptr<MappedFileRegion> ResourceManager::map_resource(const ResourceID& id)
 	{
+		std::unique_ptr<MappedFileRegion> mapping;
+
 		std::scoped_lock lock(mutex_);
 		for (ResourceProvider* provider : providers_ | std::views::reverse)
 		{
-			MappedFileRegion mapping = provider->map_resource(id);
-			if (mapping.data() != nullptr)
-				return std::move(mapping);
+			mapping = provider->map_resource(id);
+			if (mapping)
+				break;
 		}
-		return MappedFileRegion();
+		return mapping;
 	}
 
 	void ResourceManager::register_provider(ResourceProvider& provider)

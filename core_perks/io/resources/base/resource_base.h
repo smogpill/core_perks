@@ -10,6 +10,7 @@ namespace cp
 		// Stable states
 		NONE,
 		READY,
+		MISSING,
 		FAILED,
 
 		// Transitions

@@ -13,7 +13,8 @@ namespace cp
 	public:
 		virtual ~ResourceProvider() = default;
 
-		virtual MappedFileRegion map_resource(const ResourceID& id) = 0 { return MappedFileRegion(); }
+		virtual bool has_resource(const ResourceID& id) const = 0;
+		virtual std::unique_ptr<MappedFileRegion> map_resource(const ResourceID& id) = 0 { return nullptr; }
 		virtual void store_resource_async(const ResourceHandle& resource, std::function<void(bool)> on_done = [](bool) {}) { on_done(false); }
 
 	protected:

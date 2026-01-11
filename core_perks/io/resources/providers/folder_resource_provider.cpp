@@ -13,10 +13,13 @@ namespace cp
 	{
 	}
 
-	MappedFileRegion FolderResourceProvider::map_resource(const ResourceID& id)
+	std::unique_ptr<MappedFileRegion> FolderResourceProvider::map_resource(const ResourceID& id)
 	{
 		const std::filesystem::path asset_path = folder_path_ / id.string();
 		RefPtr<FileHandle> file(new FileHandle(asset_path.string(), FileHandle::Mode::READ));
-		return MappedFileRegion(file);
+		std::unique_ptr<MappedFileRegion> mapping(new MappedFileRegion(file));
+		if (!mapping->is_mapped())
+			mapping.reset();
+		return mapping;
 	}
 }

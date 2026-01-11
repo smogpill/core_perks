@@ -28,13 +28,16 @@ namespace cp
 		bool is_open() const;
 		uint64 get_size() const;
 		const auto& get_native_handle() const { return native_handle_; }
-		const std::string& get_path() const { return path_; }
+#ifdef CP_DEBUG_OR_DEV
+		const std::string& get_debug_path() const { return debug_path_; }
+#endif
 
 	private:
-		std::string path_;
-
 #ifdef CP_WINDOWS
 		HANDLE native_handle_ = INVALID_HANDLE_VALUE;
+#endif
+#ifdef CP_DEBUG_OR_DEV
+		std::string debug_path_;
 #endif
 	};
 }

@@ -25,7 +25,7 @@ namespace cp
             requested_size = file_size - offset;
         if (offset + requested_size > file_size)
         {
-            CP_ERROR("Can't map file region for file {}: region is not within bounds: [offset: {}, size: {}] while file size is {}", file_->get_path(), offset, requested_size, file_size);
+            CP_ERROR("Can't map file region for file {}: region is not within bounds: [offset: {}, size: {}] while file size is {}", file_->get_debug_path(), offset, requested_size, file_size);
             return;
         }
 
@@ -52,7 +52,7 @@ namespace cp
         mapping_ = CreateFileMappingW(file_->get_native_handle(), nullptr, protect, size_high, size_low, nullptr);
         if (!mapping_)
         {
-            CP_ERROR("Failed to map file: {}", file_->get_path());
+            CP_ERROR("Failed to map file: {}", file_->get_debug_path());
             return;
         }
 
@@ -64,7 +64,7 @@ namespace cp
         if (!data_)
         {
             DWORD err = GetLastError();
-            CP_ERROR("Failed to map view of file: {}", file_->get_path());
+            CP_ERROR("Failed to map view of file: {}", file_->get_debug_path());
             return;
         }
 

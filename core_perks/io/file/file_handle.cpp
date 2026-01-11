@@ -12,11 +12,13 @@ namespace cp
 	}
 
     FileHandle::FileHandle(FileHandle&& other)
-        : path_(other.path_)
     {
 #ifdef CP_WINDOWS
         native_handle_ = other.native_handle_;
         other.native_handle_ = INVALID_HANDLE_VALUE;
+#endif
+#ifdef CP_DEBUG_OR_DEV
+        debug_path_ = std::move(other.debug_path_);
 #endif
     }
 
@@ -67,6 +69,9 @@ namespace cp
         native_handle_ = CreateFileW(wpath.data(), desired_access, share_mode, nullptr, creation_disposition, FILE_ATTRIBUTE_NORMAL, nullptr);
         CP_TRY(native_handle_ != INVALID_HANDLE_VALUE, "Failed to open {}", path);
 #endif
+#ifdef CP_DEBUG_OR_DEV
+        debug_path_ = path;
+#endif
         return true;
 	}
 
@@ -76,6 +81,9 @@ namespace cp
 		{
 #ifdef CP_WINDOWS
 			CloseHandle(native_handle_);
+#endif
+#ifdef CP_DEBUG_OR_DEV
+            debug_path_.clear();
 #endif
 		}
 	}

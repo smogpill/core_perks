@@ -37,6 +37,7 @@ namespace cp
 		void on_all_dependencies_loading_done();
 		void flush_loading_callbacks();
 		void notify_ready_to_load();
+		void finish_loading();
 
 		std::mutex mutex_;
 		ResourceState state_ = ResourceState::NONE;

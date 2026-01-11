@@ -30,15 +30,18 @@ namespace cp
 
 	void ResourceEntry::load_async(std::function<void()>&& on_done)
 	{
-		std::scoped_lock lock(mutex_);
-		if (state_ == ResourceState::READY || state_ == ResourceState::FAILED)
-		{
-			on_done();
-			return;
-		}
-		loading_done_callbacks_.emplace_back(std::move(on_done));
 		ResourceManager::LoadRequest request;
-		request.handle_.entry_ = this;
+		{
+			std::scoped_lock lock(mutex_);
+			if (state_ == ResourceState::READY || state_ == ResourceState::FAILED)
+			{
+				on_done();
+				return;
+			}
+			loading_done_callbacks_.emplace_back(std::move(on_done));
+			request.handle_.entry_ = this;
+		}
+		
 		manager().push_load_request(std::move(request));
 	}
 
@@ -73,33 +76,37 @@ namespace cp
 	void ResourceEntry::do_loading()
 	{
 		CP_ASSERT(state_ == ResourceState::LOADING);
-		MappedFileRegion mapped_region = manager().map_resource(id_);
-		if (!mapped_region.is_mapped())
-		{
-			state_ = ResourceState::FAILED;
-			flush_loading_callbacks();
-			return;
-		}
 
 		RefPtr<Resource> resource(type_->create<Resource>());
-
-		if (!resource->on_read(mapped_region))
+		if (resource->should_load_file())
 		{
-			state_ = ResourceState::FAILED;
-			flush_loading_callbacks();
-			return;
-		}
+			MappedFileRegion mapped_region = manager().map_resource(id_);
+			if (!mapped_region.is_mapped())
+			{
+				state_ = ResourceState::FAILED;
+				flush_loading_callbacks();
+				return;
+			}
 
-		BinarySerializer serializer(std::move(mapped_region), BinarySerializer::READ);
-		resource->on_serialize(serializer);
-		if (serializer.failed())
-		{
-			state_ = ResourceState::FAILED;
-			flush_loading_callbacks();
-			return;
+			if (!resource->on_read(mapped_region))
+			{
+				state_ = ResourceState::FAILED;
+				flush_loading_callbacks();
+				return;
+			}
+
+			BinarySerializer serializer(std::move(mapped_region), BinarySerializer::READ);
+			resource->on_serialize(serializer);
+			if (serializer.failed())
+			{
+				state_ = ResourceState::FAILED;
+				flush_loading_callbacks();
+				return;
+			}
 		}
 
 		loading_resource_ = std::move(resource);
+
 		const auto& dependencies = resource->get_dependencies();
 		if (!dependencies.empty())
 		{
@@ -136,6 +143,7 @@ namespace cp
 			flush_loading_callbacks();
 			return;
 		}
+		resource_ = std::move(loading_resource_);
 		state_ = ResourceState::READY;
 	}
 

@@ -30,6 +30,8 @@ namespace cp
 		virtual MappedFileRegion map_sub_resource(const ResourceID& id) { return MappedFileRegion(); }
 		virtual void store_sub_resource_async(const ResourceHandle& resource, std::function<void(bool)> on_done = [](bool) {}) { on_done(false); }
 
+		virtual bool should_load_file() const { return true; }
+
 	protected:
 		virtual bool on_read(const MappedFileRegion& region) { return true; }
 		virtual void on_serialize(BinarySerializer& serializer);

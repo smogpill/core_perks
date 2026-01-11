@@ -12,7 +12,7 @@ namespace cp
 	public:
 		FolderResourceProvider(const std::string& path);
 
-		MappedFileRegion map_resource(const ResourceID& id) override;
+		std::unique_ptr<MappedFileRegion> map_resource(const ResourceID& id) override;
 
 	private:
 		std::filesystem::path folder_path_;
