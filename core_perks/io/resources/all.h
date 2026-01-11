@@ -6,3 +6,4 @@
 #include "core_perks/io/resources/resource.h"
 #include "core_perks/io/resources/resource_handle.h"
 #include "core_perks/io/resources/resource_manager.h"
+#include "core_perks/io/resources/providers/folder_resource_provider.h"

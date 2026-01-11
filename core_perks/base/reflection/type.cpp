@@ -13,8 +13,8 @@ namespace cp
 {
 	Type::Type(const char* name)
 		: _name(name)
-		, _id(hash::fast::hash32(_name))
 	{
+		_id = hash::fast::hash32(_name);
 		get_types().push_back(this);
 		CP_ASSERT(get_id_to_type_map().find(_id) == get_id_to_type_map().end());
 		get_id_to_type_map()[_id] = this;

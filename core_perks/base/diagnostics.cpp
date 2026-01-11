@@ -31,16 +31,6 @@ namespace cp
 #ifdef CP_WINDOWS
             MessageBoxA(nullptr, text.c_str(), "Fatal Error", MB_OK | MB_ICONERROR);
 #endif
-            crash();
         }
-    }
-
-    void crash()
-    {
-#ifdef CP_WINDOWS
-        __ud2();
-#else
-        __builtin_trap();
-#endif
     }
 }

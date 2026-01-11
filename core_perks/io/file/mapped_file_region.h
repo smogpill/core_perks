@@ -18,6 +18,7 @@ namespace cp
 		};
 		MappedFileRegion() = default;
 		MappedFileRegion(const RefPtr<FileHandle>& file, Access access = Access::READ_ONLY);
+		/// If the size is 0, the size is automatically set to match the end of the file.
 		MappedFileRegion(const RefPtr<FileHandle>& file, uint64 offset, uint64 size, Access access = Access::READ_ONLY);
 		~MappedFileRegion();
 

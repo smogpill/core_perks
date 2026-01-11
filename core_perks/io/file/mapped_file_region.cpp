@@ -21,6 +21,8 @@ namespace cp
             return;
 
         const uint64 file_size = file_->get_size();
+        if (!requested_size)
+            requested_size = file_size - offset;
         if (offset + requested_size > file_size)
         {
             CP_ERROR("Can't map file region for file {}: region is not within bounds: [offset: {}, size: {}] while file size is {}", file_->get_path(), offset, requested_size, file_size);
