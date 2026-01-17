@@ -108,10 +108,10 @@ function cp.shader_project(name, target_env)
 		buildmessage 'Compiling %{file.relpath}'
 		buildoutputs { shader_out_path }
 	filter {shader_filter, "configurations:debug or dev"}
-		buildcommands { '$(GLSLANG)/glslangValidator.exe -V -gVS --target-env '..target_env..' -d -o "'.. shader_out_path ..'" %{file.relpath}' }
+		buildcommands { '$(VULKAN_SDK)/Bin/glslangValidator.exe -V -gVS --target-env '..target_env..' -d -o "'.. shader_out_path ..'" %{file.relpath}' }
 		--buildcommands { '$(VULKAN_SDK)/bin/glslc.exe -g --target-spv='..target_env..' -o "'.. shader_out_path ..'" %{file.relpath}' }
 	filter {shader_filter, "configurations:profile or release"}
-		buildcommands { '$(GLSLANG)/glslangValidator.exe -V -g0 --target-env '..target_env..' -d -o "'.. shader_out_path ..'" %{file.relpath}' }
+		buildcommands { '$(VULKAN_SDK)/Bin/glslangValidator.exe -V -g0 --target-env '..target_env..' -d -o "'.. shader_out_path ..'" %{file.relpath}' }
 		--buildcommands { '$(VULKAN_SDK)/bin/glslc.exe -O --target-spv='..target_env..' -o "'.. shader_out_path ..'" %{file.relpath}' }
 	filter {}
 end
