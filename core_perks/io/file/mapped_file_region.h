@@ -23,7 +23,7 @@ namespace cp
 		MappedFileRegion(MappedFileRegion&& other);
 		~MappedFileRegion();
 
-		const void* data() const { return data_; }
+		const void* cdata() const { return data_; }
 		void* data();
 		uint64 size() const { return size_; }
 		std::span<uint8> span() { return std::span<uint8>(static_cast<uint8*>(data_), size_); }

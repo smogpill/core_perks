@@ -33,4 +33,9 @@ namespace cp
 #endif
         }
     }
+
+    void crash()
+    {
+        *(volatile int*)0 = 0;
+    }
 }

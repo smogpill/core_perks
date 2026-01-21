@@ -49,11 +49,11 @@ namespace cp
 #define CP_PRAGMA_MESSAGE(_x_)	_Pragma(message(__FILE__ "("  CP_STRINGIFY(__LINE__) "): " _x_))
 
 #ifdef CP_MSVC
-	#define CP_BREAKPOINT() cp::return_void(IsDebuggerPresent() && (__debugbreak(), 1))
+	#define CP_BREAKPOINT() __debugbreak()
 	#define CP_FORCE_INLINE __forceinline
 	#define CP_FORCE_SYMBOL_INCLUSION_ATTRIBUTE __declspec(dllexport)
 #else
-	#define CP_BREAKPOINT() std::breakpoint_if_debugging()
+	#define CP_BREAKPOINT() std::breakpoint()
 	#define CP_FORCE_INLINE [[gnu::always_inline]]
 	#define CP_FORCE_SYMBOL_INCLUSION_ATTRIBUTE __attribute__ ((used))
 #endif
