@@ -27,12 +27,15 @@ namespace cp
 	{
 		std::scoped_lock lock(mutex_);
 		loading_resource_ = resource;
-		if (loading_resource_)
+		if (!loading_resource_)
 		{
-			loading_resource_->entry_ = this;
-			state_ = ResourceState::WAITING_DEPENDENCIES;
-			load_dependencies_async();
+			on_done();
+			return;
 		}
+		loading_resource_->entry_ = this;
+		loading_done_callbacks_.emplace_back(std::move(on_done));
+		state_ = ResourceState::WAITING_DEPENDENCIES;
+		load_dependencies_async();
 	}
 
 	void ResourceEntry::load_async(std::function<void()>&& on_done)
