@@ -9,7 +9,7 @@ namespace cp
 	class Vec2
 	{
 	public:
-		CP_FORCE_INLINE Vec2() = default;
+		CP_FORCE_INLINE Vec2() : x_(0), y_(0) {}
 		CP_FORCE_INLINE Vec2(T xy) : x_(xy), y_(xy) {}
 		CP_FORCE_INLINE Vec2(T x, T y) : x_(x), y_(y) {}
 		template <class U>
@@ -25,8 +25,8 @@ namespace cp
 		CP_FORCE_INLINE bool all() const requires std::integral<T> { return x_ && y_; }
 		CP_FORCE_INLINE bool any() const requires std::integral<T> { return x_ || y_; }
 
-		CP_FORCE_INLINE T& operator[](int idx) { CP_ASSERT(idx < 2); return (&x_)[idx]; }
-		CP_FORCE_INLINE T operator[](int idx) const { CP_ASSERT(idx < 2); return (&x_)[idx]; }
+		CP_FORCE_INLINE T& operator[](int idx) { CP_ASSERT(idx < 2); return xy_[idx]; }
+		CP_FORCE_INLINE T operator[](int idx) const { CP_ASSERT(idx < 2); return xy_[idx]; }
 
 		CP_FORCE_INLINE bool operator==(const Vec2& v) const { return x_ == v.x_ && y_ == v.y_; }
 		CP_FORCE_INLINE bool operator!=(const Vec2& v) const { return x_ != v.x_ || y_ != v.y_; }
@@ -56,8 +56,11 @@ namespace cp
 		CP_FORCE_INLINE static Vec2 unit_x() { return Vec2(1, 0); }
 		CP_FORCE_INLINE static Vec2 unit_y() { return Vec2(0, 1); }
 
-		T x_ = 0;
-		T y_ = 0;
+		union
+		{
+			struct { T x_, y_; };
+			T xy_[2];
+		};
 	};
 
 	using Vec2f = Vec2<float>;

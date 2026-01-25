@@ -10,18 +10,20 @@ namespace cp
 	class alignas(alignof(Vec3<T>)) Mat3
 	{
 	public:
-		Mat3() = default;
+		Mat3() : x_(Vec3<T>::unit_x()), y_(Vec3<T>::unit_y()), z_(Vec3<T>::unit_z()) {}
 		Mat3(T diag) : x_(diag, 0, 0), y_(0, diag, 0), z_(0, 0, diag) {}
 		Mat3(const Vec3<T>& x, const Vec3<T>& y, const Vec3<T>& z) : x_(x), y_(y), z_(z) {}
 		template <class U>
 		Mat3(const Mat3<U>& o) : x_(static_cast<Vec3<T>>(o.x_)), y_(static_cast<Vec3<T>>(o.y_)), z_(static_cast<Vec3<T>>(o.z_)) {}
 
-		CP_FORCE_INLINE Vec3<T>& operator[](int idx) { CP_ASSERT(idx < 3); return (&x_)[idx]; }
-		CP_FORCE_INLINE const Vec3<T>& operator[](int idx) const { CP_ASSERT(idx < 3); return (&x_)[idx]; }
+		CP_FORCE_INLINE Vec3<T>& operator[](int idx) { CP_ASSERT(idx < 3); return xyz_[idx]; }
+		CP_FORCE_INLINE const Vec3<T>& operator[](int idx) const { CP_ASSERT(idx < 3); return xyz_[idx]; }
 
-		Vec3<T> x_ = Vec3<T>::unit_x();
-		Vec3<T> y_ = Vec3<T>::unit_y();
-		Vec3<T> z_ = Vec3<T>::unit_z();
+		union
+		{
+			struct { Vec3<T> x_, y_, z_; };
+			Vec3<T> xyz_[3];
+		};
 	};
 
 	using Mat3f = Mat3<float>;

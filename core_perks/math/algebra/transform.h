@@ -11,7 +11,7 @@ namespace cp
 	class alignas(Vec3<T>) Transform
 	{
 	public:
-		CP_FORCE_INLINE Transform() = default;
+		CP_FORCE_INLINE Transform() : translation_scale_(Vec4<T>::unit_w()) {}
 		CP_FORCE_INLINE Transform(const Vec3<T>& translation, const Quat<T>& rotation, T scale)
 			: translation_scale_(translation.x_, translation.y_, translation.z_, scale), rotation_(rotation) {}
 		CP_FORCE_INLINE const Vec3<T>& get_translation() const { return translation_scale_.xyz(); }
@@ -32,7 +32,7 @@ namespace cp
 		Transform<T>& operator*=(const Transform<T>& o) { *this = *this * o; return *this; }
 
 	private:
-		Vec4<T> translation_scale_ = Vec4<T>::unit_w();
+		Vec4<T> translation_scale_;
 		Quat<T> rotation_;
 	};
 

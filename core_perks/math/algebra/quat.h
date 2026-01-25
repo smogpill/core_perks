@@ -12,7 +12,7 @@ namespace cp
 	class alignas(alignof(T) * 4) Quat
 	{
 	public:
-		CP_FORCE_INLINE Quat() = default;
+		CP_FORCE_INLINE Quat() : x_(0), y_(0), z_(0), w_(1) {}
 		CP_FORCE_INLINE Quat(T x, T y, T z, T w) : x_(x), y_(y), z_(z), w_(w) {}
 		CP_FORCE_INLINE Quat(const Vec4<T>& v) : x_(v.x_), y_(v.y_), z_(v.z_), w_(v.w_) {}
 		CP_FORCE_INLINE Quat(const Vec3<T>& xyz, T w) : x_(xyz.x_), y_(xyz.y_), z_(xyz.z_), w_(w) {}
@@ -45,10 +45,11 @@ namespace cp
 		CP_FORCE_INLINE static Quat rotation_y(T angle) { const T half_angle = angle * 0.5; return Quat(0, sin(angle), 0, cos(angle)); }
 		CP_FORCE_INLINE static Quat rotation_z(T angle) { const T half_angle = angle * 0.5; return Quat(0, 0, sin(angle), cos(angle)); }
 
-		T x_ = 0;
-		T y_ = 0;
-		T z_ = 0;
-		T w_ = 1;
+		union
+		{
+			struct { T x_; T y_; T z_; T w_;};
+			T xyzw_[4];
+		};
 	};
 
 	using Quatf = Quat<float>;

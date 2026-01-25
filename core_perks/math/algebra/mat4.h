@@ -11,7 +11,7 @@ namespace cp
 	class alignas(alignof(Vec4<T>)) Mat4
 	{
 	public:
-		Mat4() = default;
+		Mat4() : x_(Vec4<T>::unit_x()), y_(Vec4<T>::unit_y()), z_(Vec4<T>::unit_z()), w_(Vec4<T>::unit_w()) {}
 		Mat4(T diag) : x_(diag, 0, 0, 0), y_(0, diag, 0, 0), z_(0, 0, diag, 0), w_(0, 0, 0, diag) {}
 		Mat4(const Vec4<T>& x, const Vec4<T>& y, const Vec4<T>& z, const Vec4<T>& w) : x_(x), y_(y), z_(z), w_(w) {}
 		template <class U>
@@ -19,15 +19,16 @@ namespace cp
 
 		bool is_scale_uniform(float tolerance = 1e-3f) const;
 
-		CP_FORCE_INLINE Vec4<T>& operator[](int idx) { CP_ASSERT(idx < 4); return (&x_)[idx]; }
-		CP_FORCE_INLINE const Vec4<T>& operator[](int idx) const { CP_ASSERT(idx < 4); return (&x_)[idx]; }
+		CP_FORCE_INLINE Vec4<T>& operator[](int idx) { CP_ASSERT(idx < 4); return xyzw_[idx]; }
+		CP_FORCE_INLINE const Vec4<T>& operator[](int idx) const { CP_ASSERT(idx < 4); return xyzw_[idx]; }
 		Mat4 operator*(const Mat4& o) const;
 		CP_FORCE_INLINE Mat4& operator*=(const Mat4& o) const { *this = *this * o; return *this; }
 
-		Vec4<T> x_ = Vec4<T>::unit_x();
-		Vec4<T> y_ = Vec4<T>::unit_y();
-		Vec4<T> z_ = Vec4<T>::unit_z();
-		Vec4<T> w_ = Vec4<T>::unit_w();
+		union
+		{
+			struct { Vec4<T> x_, y_, z_, w_; };
+			Vec4<T> xyzw_[4];
+		};
 	};
 
 	using Mat4f = Mat4<float>;

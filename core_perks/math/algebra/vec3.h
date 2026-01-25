@@ -9,7 +9,7 @@ namespace cp
 	class alignas(alignof(T) * 4) Vec3
 	{
 	public:
-		CP_FORCE_INLINE Vec3() = default;
+		CP_FORCE_INLINE Vec3() : x_(0), y_(0), z_(0) {}
 		CP_FORCE_INLINE Vec3(T xyz) : x_(xyz), y_(xyz), z_(xyz) {}
 		CP_FORCE_INLINE Vec3(T x, T y, T z) : x_(x), y_(y), z_(z) {}
 		template <class U>
@@ -65,22 +65,9 @@ namespace cp
 		union
 		{
 			struct { T x_, y_, z_; };
-			T xyz_[3] = {};
+			T xyz_[3];
 		};
 	};
-
-	/*
-	template <class T>
-	struct CallOnElements<Vec3<T>>
-	{
-		template <class F>
-		CP_FORCE_INLINE static Vec3<T> call(F func, const Vec3<T>& a) { return Vec3<T>(func(a.x_), func(a.y_), func(a.z_)); }
-		template <class F>
-		CP_FORCE_INLINE static Vec3<T> call(F func, const Vec3<T>& a, const Vec3<T>& b) { return Vec3<T>(func(a.x_, b.x_), func(a.y_, b.y_), func(a.z_, b.z_)); }
-		template <class F>
-		CP_FORCE_INLINE static Vec3<T> call(F func, const Vec3<T>& a, const Vec3<T>& b, const Vec3<T>& c) { return Vec3<T>(func(a.x_, b.x_, c.x_), func(a.y_, b.y_, c.y_), func(a.z_, b.z_, c.z_)); }
-	};
-	*/
 
 	using Vec3f = Vec3<float>;
 	using Vec3d = Vec3<double>;
@@ -150,21 +137,5 @@ namespace cp
 	CP_FORCE_INLINE Vec3b greater_or_equal(const Vec3<T>& a, const Vec3<T>& b)
 	{
 		return Vec3b(a.x_ >= b.x_, a.y_ >= b.y_, a.z_ >= b.z_);
-	}
-}
-
-namespace std
-{
-	template <class T>
-	struct tuple_size<cp::Vec3<T>> : integral_constant<size_t, 3> {};
-
-	template <size_t I, class T>
-	struct tuple_element<I, cp::Vec3<T>> { using type = T; };
-
-	template <size_t I, typename T>
-	constexpr T& get(cp::Vec3<T>& v) noexcept
-	{
-		static_assert(I < 3);
-		return v.xyz_[I];
 	}
 }

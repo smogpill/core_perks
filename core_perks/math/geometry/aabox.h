@@ -13,7 +13,7 @@ namespace cp
 		CP_FORCE_INLINE AABox() = default;
 		CP_FORCE_INLINE AABox(const Vec3<T>& min, const Vec3<T>& max) : min_(min), max_(max) {}
 
-		//CP_FORCE_INLINE bool empty() const { return min_ > max_; }
+		CP_FORCE_INLINE bool valid() const { return (min_ <= max_).all(); }
 
 		Vec3<T> min_ = 1e15f;
 		Vec3<T> max_ = -1e15f;

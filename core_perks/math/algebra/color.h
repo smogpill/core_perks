@@ -8,10 +8,12 @@ namespace cp
 	class Color
 	{
 	public:
-	private:
-		uint8 r_ = 0;
-		uint8 g_ = 0;
-		uint8 b_ = 0;
-		uint8 a_ = 0;
+		Color() : r_(0), g_(0), b_(0), a_(255) {}
+		union
+		{
+			struct { uint8 r_, g_, b_, a_; };
+			struct { uint8 x_, y_, z_, w_; };
+			uint32 rgba_;
+		};
 	};
 }

@@ -6,12 +6,14 @@
 
 namespace cp
 {
-	class alignas(16) Mat34f
+	template <class T>
+	class alignas(alignof(Vec4<T>)) Mat34
 	{
 	public:
-	private:
-		Vec4f x_;
-		Vec4f y_;
-		Vec4f z_;
+		union
+		{
+			struct { Vec4<T> x_, y_, z_; };
+			Vec4<T> xyz_[3] = { Vec4<T>::unit_x(), Vec4<T>::unit_y(), Vec4<T>::unit_z() };
+		};
 	};
 }
