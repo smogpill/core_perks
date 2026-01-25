@@ -42,11 +42,11 @@ namespace cp
 	constexpr bool return_true() { return true; }
 }
 
-#define _CP_STRINGIFY(_x_) #_x_
-#define CP_STRINGIFY(_x_) _CP_STRINGIFY(_x_)
-#define _CP_CONCAT(_x_, _y_) _x_ ## _y_
-#define CP_CONCAT(_x_, _y_) _CP_CONCAT(_x_, _y_)
-#define CP_PRAGMA_MESSAGE(_x_)	_Pragma(message(__FILE__ "("  CP_STRINGIFY(__LINE__) "): " _x_))
+#define _CP_STRINGIFY(X) #X
+#define CP_STRINGIFY(X) _CP_STRINGIFY(X)
+#define _CP_CONCAT(X, Y) X ## Y
+#define CP_CONCAT(X, Y) _CP_CONCAT(X, Y)
+#define CP_PRAGMA_MESSAGE(X)	_Pragma(message(__FILE__ "("  CP_STRINGIFY(__LINE__) "): " X))
 
 #ifdef CP_MSVC
 	#define CP_BREAKPOINT() __debugbreak()
@@ -71,9 +71,9 @@ namespace cp
 	#define CP_DEOPTIMIZE_POP()
 #endif
 
-#define CP_SAFE_SCOPE(_x_) do { _x_ } while (0)
+#define CP_SAFE_SCOPE(EXPRESSIONS) do { EXPRESSIONS } while (0)
 
-#define CP_AS_CONST(_member_) const_cast<std::remove_reference_t<decltype(*this)>*>(this)->_member_
+#define CP_AS_CONST(MEMBER) const_cast<std::remove_reference_t<decltype(*this)>*>(this)->MEMBER
 
 #include "core_perks/base/diagnostics.h"
 #include "core_perks/base/reflection/reflection.h"

@@ -106,12 +106,6 @@ namespace cp
 		return Vec3<T>(a.y_ * b.z_ - a.z_ * b.y_, a.z_ * b.x_ - a.x_ * b.z_, a.x_ * b.y_ - a.y_ * b.x_);
 	}
 
-	template <class T>
-	CP_FORCE_INLINE Vec3<T> abs(const Vec3<T>& a)
-	{
-		return Vec3(abs(a.x_), abs(a.y_), abs(a.z_));
-	}
-
 	template <std::floating_point T>
 	CP_FORCE_INLINE Vec3<T> normalize(const Vec3<T>& a)
 	{

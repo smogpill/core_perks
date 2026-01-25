@@ -50,67 +50,44 @@ namespace cp
 			return func(a, b, c);
 	}
 
-	/*
-	template <size_t N, typename Func, typename T>
-	CP_FORCE_INLINE void apply_to_element(Func&& func, const T& in, T& out)
-	{
-		if constexpr (N == 0)
-			return;
+#define CP_ELEMENTWISE_1(X, IMPL) (const T& X) { return elementwise([](const auto& X) IMPL, X); }
+#define CP_ELEMENTWISE_2(X, Y, IMPL) (const T& X, const T& Y) { return elementwise([](const auto& X, const auto& Y) IMPL, X, Y); }
+#define CP_ELEMENTWISE_3(X, Y, Z, IMPL) (const T& X, const T& Y, const T& Z) { return elementwise([](const auto& X, const auto& Y, const auto& Z) IMPL, X, Y, Z); }
 
-		apply_to_element<N - 1>(func, in, out);
-		std::get<N - 1>(out) = func(std::get<N - 1>(in));
-	}
+	template <class T> CP_FORCE_INLINE T abs CP_ELEMENTWISE_1(x, { return std::abs(x); });
+	template <class T> CP_FORCE_INLINE T fma CP_ELEMENTWISE_3(x, y, z, { return std::fma(x, y, z); });
+	template <class T> CP_FORCE_INLINE T sign CP_ELEMENTWISE_1(x, { return (T(0) < x) - (x < T(0)); });
+	template <class T> CP_FORCE_INLINE T copysign CP_ELEMENTWISE_2(x, y, { return std::copysign(x, y); });
+	template <class T> CP_FORCE_INLINE T sqrt CP_ELEMENTWISE_1(x, { return std::sqrt(x); });
+	template <class T> CP_FORCE_INLINE T rsqrt CP_ELEMENTWISE_1(x, { return T(1) / sqrt(x); });
+	template <class T> CP_FORCE_INLINE T exp CP_ELEMENTWISE_1(x, { return std::exp(x); });
+	template <class T> CP_FORCE_INLINE T log CP_ELEMENTWISE_1(x, { return std::log(x); });
+	template <class T> CP_FORCE_INLINE T pow CP_ELEMENTWISE_2(x, y, { return std::pow(x, y); });
+	template <class T> CP_FORCE_INLINE T exp2 CP_ELEMENTWISE_1(x, { return std::exp2(x); });
+	template <class T> CP_FORCE_INLINE T log2 CP_ELEMENTWISE_1(x, { return std::log2(x); });
+	template <class T> CP_FORCE_INLINE T floor CP_ELEMENTWISE_1(x, { return std::floor(x); });
+	template <class T> CP_FORCE_INLINE T ceil CP_ELEMENTWISE_1(x, { return std::ceil(x); });
+	template <class T> CP_FORCE_INLINE T round CP_ELEMENTWISE_1(x, { return std::round(x); });
+	template <class T> CP_FORCE_INLINE T trunc CP_ELEMENTWISE_1(x, { return std::trunc(x); });
+	template <class T> CP_FORCE_INLINE T fract CP_ELEMENTWISE_1(x, { return x - floor(x); });
+	template <class T> CP_FORCE_INLINE T min CP_ELEMENTWISE_2(x, y, { return std::min(x, y); });
+	template <class T> CP_FORCE_INLINE T max CP_ELEMENTWISE_2(x, y, { return std::max(x, y); });
+	template <class T> CP_FORCE_INLINE T clamp CP_ELEMENTWISE_3(x, low, high, { return std::clamp(x, low, high); });
+	template <class T> CP_FORCE_INLINE T saturate CP_ELEMENTWISE_1(x, { return clamp(x, T(0), T(1)); });
 
-	template <typename Func, typename T>
-	CP_FORCE_INLINE T elementwise(Func&& func, const T& value)
-	{
-		T result;
-		apply_to_element<std::tuple_size<T>::value>(func, value, result);
-		return result;
-	}*/
+	template <class T> CP_FORCE_INLINE T mod CP_ELEMENTWISE_2(x, y,
+		{
+			CP_ASSERT(std::isfinite(y));
+			CP_ASSERT(y);
+			return fma(-y, trunc(x / y), x);
+		});
 
-	//CP_FORCE_INLINE
-#define CP_ELEMENTWISE_1(impl) elementwise([](const auto& x) impl, x)
-#define CP_ELEMENTWISE_2(impl) elementwise([](const auto& x, const auto& y) impl, a, b)
-#define CP_ELEMENTWISE_3(impl) elementwise([](const auto& x, const auto& y, const auto& z) impl, a, b, c)
-
-	template <class T> CP_FORCE_INLINE T abs(const T& x) { return CP_ELEMENTWISE_1({ return std::abs(x); }); }
-
-	//template <class T> CP_FORCE_INLINE T abs(const T& x) { return elementwise([](const auto& v) { return std::abs(v); }, x); }
-
-	template <class T> CP_FORCE_INLINE T fma(T x, T y, T z) { return std::fma(x, y, z); }
-	template <class T> CP_FORCE_INLINE T sign(T x) { return (T(0) < x) - (x < T(0)); }
-	template <class T> CP_FORCE_INLINE T copysign(T x, T y) { return std::copysign(x, y); }
-	template <class T> CP_FORCE_INLINE T sqrt(T x) { return std::sqrt(x); }
-	template <class T> CP_FORCE_INLINE T rsqrt(T x) { return T(1) / sqrt(x); }
-	template <class T> CP_FORCE_INLINE T exp(T x) { return std::exp(x); }
-	template <class T> CP_FORCE_INLINE T log(T x) { return std::log(x); }
-	template <class T> CP_FORCE_INLINE T pow(T x, T y) { return std::pow(x, y); }
-	template <class T> CP_FORCE_INLINE T exp2(T x) { return std::exp2(x); }
-	template <class T> CP_FORCE_INLINE T log2(T x) { return std::log2(x); }
-	template <class T> CP_FORCE_INLINE T floor(T x) { return std::floor(x); }
-	template <class T> CP_FORCE_INLINE T ceil(T x) { return std::ceil(x); }
-	template <class T> CP_FORCE_INLINE T round(T x) { return std::round(x); }
-	template <class T> CP_FORCE_INLINE T trunc(T x) { return std::trunc(x); }
-	template <class T> CP_FORCE_INLINE T fract(T x) { return x - floor(x); }
-	template <class T> CP_FORCE_INLINE T min(const T& a, const T& b) { return elementwise([](const auto& x, const auto& y) { return std::min(x, y); }, a, b); }
-	template <class T> CP_FORCE_INLINE T max(const T& a, const T& b) { return elementwise([](const auto& x, const auto& y) { return std::max(x, y); }, a, b); }
-	template <class T> CP_FORCE_INLINE T clamp(T x, T low, T high) { return std::clamp(x, low, high); }
-	template <class T> CP_FORCE_INLINE T saturate(T x) { return clamp(x, T(0), T(1)); }
-
-	template <class T> CP_FORCE_INLINE T mod(T x, T y)
-	{
-		CP_ASSERT(std::isfinite(y));
-		CP_ASSERT(y);
-		return fma(-y, trunc(x / y), x);
-	}
-
-	template <class T> CP_FORCE_INLINE T wrap(T x, T low, T high)
-	{
-		CP_ASSERT(low < high);
-		const T range = high - low;
-		return x - range * floor((x - low) / range);
-	}
+	template <class T> CP_FORCE_INLINE T wrap CP_ELEMENTWISE_3(x, low, high,
+		{
+			CP_ASSERT(low < high);
+			const auto range = high - low;
+			return x - range * floor((x - low) / range);
+		});
 
 	/// Requires testing
 	/*
