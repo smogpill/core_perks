@@ -10,11 +10,16 @@ namespace cp
 
 	void Test::execute_all()
 	{
-		for (const Type* type : Test::get_type_static().get_derived())
+		for (const Type* type : TypeManager::get_types())
 		{
+			if (!type->is_a<Test>())
+				continue;
 			Test* test = type->create<Test>();
-			test->execute();
-			delete test;
+			if (test)
+			{
+				test->execute();
+				delete test;
+			}
 		}
 	}
 }

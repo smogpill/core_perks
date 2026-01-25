@@ -63,7 +63,7 @@ namespace cp
 		std::unordered_map<ResourceID, ResourceEntry*, Hash> map_;
 		std::queue<LoadRequest> load_requests_;
 		std::queue<StoreRequest> store_requests_;
-		std::vector<ResourceProvider*> providers_;
+		Vector<ResourceProvider*> providers_;
 		uint max_parallel_updates_ = 4;
 
 		/*

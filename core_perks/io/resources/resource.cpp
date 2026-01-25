@@ -23,13 +23,13 @@ namespace cp
 	void Resource::add_dependency(const ResourceHandle& handle)
 	{
 		CP_ASSERT(handle);
-		if (!contains(dependencies_, handle))
+		if (!dependencies_.contains(handle))
 			dependencies_.push_back(handle);
 	}
 
 	void Resource::remove_dependency(const ResourceHandle& handle)
 	{
-		erase_first(dependencies_, handle);
+		dependencies_.erase_first(handle);
 	}
 
 	void Resource::on_serialize(BinarySerializer& serializer)

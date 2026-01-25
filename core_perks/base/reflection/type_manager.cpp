@@ -8,7 +8,19 @@ namespace cp
 {
 	TypeManager::TypeManager()
 	{
-		for (Type* type : Type::get_types())
+		for (Type* type : get_types())
 			type->init();
+	}
+
+	Vector<Type*>& TypeManager::get_types()
+	{
+		static Vector<Type*> types;
+		return types;
+	}
+
+	std::unordered_map<uint32, Type*>& TypeManager::get_id_to_type_map()
+	{
+		static std::unordered_map<uint32, Type*> map;
+		return map;
 	}
 }

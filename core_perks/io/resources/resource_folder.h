@@ -39,7 +39,7 @@ namespace cp
 		ResourceInfo* get_file(const ResourceHandle& resource) const;
 
 		std::filesystem::path path_;
-		std::vector<ResourceInfo*> open_files_;
+		Vector<ResourceInfo*> open_files_;
 	};
 }
 

@@ -57,7 +57,7 @@ namespace cp
 		ResourceID id_;
 		RefPtr<Resource> resource_;
 		RefPtr<Resource> loading_resource_;
-		std::vector<std::function<void()>> loading_done_callbacks_;
+		Vector<std::function<void()>> loading_done_callbacks_;
 		std::atomic<uint32> waiting_dependencies_count_ = 0;
 	};
 }

@@ -15,15 +15,15 @@ namespace cp
 		: _name(name)
 	{
 		_id = hash::fast::hash32(_name);
-		get_types().push_back(this);
-		CP_ASSERT(get_id_to_type_map().find(_id) == get_id_to_type_map().end());
-		get_id_to_type_map()[_id] = this;
+		TypeManager::get_types().push_back(this);
+		CP_ASSERT(TypeManager::get_id_to_type_map().find(_id) == TypeManager::get_id_to_type_map().end());
+		TypeManager::get_id_to_type_map()[_id] = this;
 	}
 
 	Type::~Type()
 	{
-		get_id_to_type_map().erase(_id);
-		swap_and_pop_first(get_types(), this);
+		TypeManager::get_id_to_type_map().erase(_id);
+		TypeManager::get_types().swap_and_pop_first(this);
 	}
 
 	void Type::init(Type* type)
@@ -43,7 +43,7 @@ namespace cp
 
 	Type* Type::get_by_id(Id id)
 	{
-		const auto& map = get_id_to_type_map();
+		const auto& map = TypeManager::get_id_to_type_map();
 		auto it = map.find(id);
 		if (it != map.end())
 			return it->second;
@@ -60,27 +60,6 @@ namespace cp
 			it = it->_base;
 		} while (it);
 		return false;
-	}
-
-	std::vector<Type*> Type::get_derived() const
-	{
-		std::vector<Type*> derived_types;
-		for (Type* type : get_types())
-			if (type != this && type->is_a(*this))
-				derived_types.push_back(type);
-		return derived_types;
-	}
-
-	std::vector<Type*>& Type::get_types()
-	{
-		static std::vector<Type*> types;
-		return types;
-	}
-
-	std::unordered_map<uint32, Type*>& Type::get_id_to_type_map()
-	{
-		static std::unordered_map<uint32, Type*> map;
-		return map;
 	}
 
 	BinaryInputStream& operator>>(BinaryInputStream& stream, Type*& type)

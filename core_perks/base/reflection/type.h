@@ -70,7 +70,8 @@ namespace cp
 
 		// Derivation
 		bool is_a(const Type& type) const;
-		std::vector<Type*> get_derived() const;
+		template <class T>
+		bool is_a() const { const Type* type = get<T>(); return type && is_a(*type); }
 
 		// Factory
 		template <class T = void>
@@ -103,9 +104,6 @@ namespace cp
 		std::function<void(void*, void*)> _move;
 		std::function<void(void*)> _destruct;
 		std::function<void(Type&)> _init;
-
-		static std::vector<Type*>& get_types();
-		static std::unordered_map<uint32, Type*>& get_id_to_type_map();
 	};
 
 	BinaryInputStream& operator>>(BinaryInputStream& stream, Type*& type);

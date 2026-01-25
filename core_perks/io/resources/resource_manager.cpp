@@ -157,14 +157,14 @@ namespace cp
 	void ResourceManager::register_provider(ResourceProvider& provider)
 	{
 		std::scoped_lock lock(mutex_);
-		CP_ASSERT(!contains(providers_, &provider));
+		CP_ASSERT(!providers_.contains(&provider));
 		providers_.push_back(&provider);
 	}
 
 	void ResourceManager::unregister_provider(ResourceProvider& provider)
 	{
 		std::scoped_lock lock(mutex_);
-		erase_first(providers_, &provider);
+		providers_.erase_first(&provider);
 	}
 
 	void ResourceManager::on_entry_destroyed(ResourceEntry& entry)

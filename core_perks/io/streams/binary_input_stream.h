@@ -9,7 +9,6 @@ namespace cp
 	{
 	public:
 		BinaryInputStream(const void* data, uint64 size);
-		BinaryInputStream(const void* data);
 
 		void read(void* buffer, uint64 size);
 		template <class T> requires std::is_trivially_copyable_v<T>
@@ -49,7 +48,7 @@ namespace cp
 	BinaryInputStream& operator>>(BinaryInputStream& stream, std::string& str);
 
 	template <class T>
-	BinaryInputStream& operator>>(BinaryInputStream& stream, std::vector<T>& v)
+	BinaryInputStream& operator>>(BinaryInputStream& stream, Vector<T>& v)
 	{
 		uint32 size = 0;
 		stream >> size;

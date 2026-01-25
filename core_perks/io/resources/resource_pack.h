@@ -25,7 +25,7 @@ namespace cp
 
 		virtual ResourceMapping map_sub_resource(const ResourceID& id) override;
 
-		void build(const std::vector<ResourceHandle>& resources);
+		void build(const Vector<ResourceHandle>& resources);
 
 	protected:
 		void on_serialize(BinarySerializer& serializer) override;
@@ -35,7 +35,7 @@ namespace cp
 	private:
 		SubResourceInfo* get_sub_resource_info(const ResourceHandle& resource);
 
-		std::vector<SubResourceInfo> sub_resources_;
+		Vector<SubResourceInfo> sub_resources_;
 		//std::unorder_map<uint64, SubResourceInfo*> id_hash_to_sub_resource_;
 		RefPtr<FileHandle> file_handle_;
 	};

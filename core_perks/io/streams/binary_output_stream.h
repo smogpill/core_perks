@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/memory/memory.h"
+#include "core_perks/containers/vector.h"
 
 namespace cp
 {
@@ -53,7 +54,7 @@ namespace cp
 
 	private:
 		static constexpr uint32 block_size = 16 * page_size;
-		std::vector<uint8*> blocks_;
+		Vector<uint8*> blocks_;
 	};
 
 	class DummyOutputMemory : public OutputMemory
@@ -88,7 +89,7 @@ namespace cp
 	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const std::string& str);
 
 	template <class T>
-	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const std::vector<T>& v)
+	BinaryOutputStream& operator<<(BinaryOutputStream& stream, const Vector<T>& v)
 	{
 		const uint32 size = (uint32)v.size();
 		stream << size;

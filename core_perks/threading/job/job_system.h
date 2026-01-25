@@ -37,7 +37,7 @@ namespace cp
     private:
         void WorkerThread();
 
-        std::vector<std::jthread> threads_;
+        Vector<std::jthread> threads_;
         std::deque<Job> job_queue_;
         std::mutex queue_mutex_;
         std::condition_variable condition_;

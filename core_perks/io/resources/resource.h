@@ -28,7 +28,7 @@ namespace cp
 		void clear_dependencies();
 		void add_dependency(const ResourceHandle& handle);
 		void remove_dependency(const ResourceHandle& handle);
-		const std::vector<ResourceHandle>& get_dependencies() const { return dependencies_; }
+		const Vector<ResourceHandle>& get_dependencies() const { return dependencies_; }
 
 		// Sub resources
 		virtual ResourceMapping map_sub_resource(const ResourceID& id) { return ResourceMapping(); }
@@ -54,8 +54,8 @@ namespace cp
 		std::mutex mutex_;
 		ResourceEntry* entry_ = nullptr;
 		uint32 version_ = 0;
-		std::vector<ResourceHandle> dependencies_;
-		std::vector<Resource*> dependents_;
-		std::vector<ResourceHandle*> users_;
+		Vector<ResourceHandle> dependencies_;
+		Vector<Resource*> dependents_;
+		Vector<ResourceHandle*> users_;
 	};
 }

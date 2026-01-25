@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include "core_perks/memory/allocators.h"
+#include "core_perks/memory/memory.h"
 
 namespace cp
 {
@@ -18,6 +19,7 @@ namespace cp
 		Vector(Vector<T>&& other);
 		Vector(Vector<T>&& other, AllocTag tag);
 		Vector(std::initializer_list<T> list, AllocTag tag = AllocTag());
+		Vector(const T* begin, const T* end, AllocTag tag = AllocTag());
 		~Vector();
 
 		void clear();
@@ -83,8 +85,7 @@ namespace cp
 		AllocTag tag_ = 0;
 	};
 
-
-	uint32 compute_best_Vector_capacity(uint32 desired_capacity);
+	uint32 grow_vector_capacity(uint32 old_capacity, uint32 desired_capacity);
 
 	template <class T>
 	Vector<T>::Vector(uint32 initial_size, AllocTag tag)
@@ -112,7 +113,7 @@ namespace cp
 		: data_(other.data_)
 		, size_(other.size_)
 		, capacity_(other.capacity_)
-		, tag_(other.tag)
+		, tag_(other.tag_)
 	{
 		other.data_ = nullptr;
 		other.size_ = 0;
@@ -130,6 +131,17 @@ namespace cp
 	}
 
 	template <class T>
+	Vector<T>::Vector(const T* begin, const T* end, AllocTag tag)
+		: tag_(tag)
+	{
+		CP_ASSERT(end >= begin);
+		const uint32 other_size = uint32(end - begin);
+		resize(other_size);
+		for (uint32 i = 0; i < other_size; ++i)
+			new (data_ + i) T(begin[i]);
+	}
+
+	template <class T>
 	Vector<T>::Vector(std::initializer_list<T> list, AllocTag tag)
 		: tag_(tag)
 	{
@@ -142,7 +154,7 @@ namespace cp
 		if (data_)
 		{
 			std::destroy(data_, data_ + size_);
-			free(data_);
+			cp::free(data_);
 		}
 	}
 
@@ -186,12 +198,12 @@ namespace cp
 			const uint alignment = alignof(T) > 16 ? alignof(T) : 16;
 			T* new_buffer;
 			const size_t new_capacity8 = uint64(new_capacity) * sizeof(T);
-			new_buffer = static_cast<T*>(aligned_alloc(alignment, new_capacity8, tag_));
+			new_buffer = static_cast<T*>(allocate(new_capacity8, alignment, tag_));
 			if (data_)
 			{
 				std::uninitialized_move(data_, data_ + size_, new_buffer);
 				std::destroy(data_, data_ + size_);
-				free(data_);
+				cp::free(data_);
 			}
 			data_ = new_buffer;
 			capacity_ = new_capacity;
@@ -202,7 +214,7 @@ namespace cp
 	CP_FORCE_INLINE void Vector<T>::reserve(uint32 size)
 	{
 		if (size > capacity_)
-			set_capacity(compute_best_Vector_capacity(size));
+			set_capacity(grow_vector_capacity(capacity_, size));
 	}
 
 	template <class T>

@@ -71,6 +71,6 @@ namespace cp
 		StateMachine* parent_ = nullptr;
 		StateMachine* current_state_ = nullptr;
 		StateID id_ = 0;
-		std::vector<RefPtr<StateMachine>> states_;
+		Vector<RefPtr<StateMachine>> states_;
 	};
 }
